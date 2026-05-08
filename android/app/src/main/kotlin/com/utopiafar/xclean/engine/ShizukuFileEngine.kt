@@ -1,4 +1,4 @@
-package com.xclean.app.engine
+package com.utopiafar.xclean.engine
 
 import rikka.shizuku.Shizuku
 import java.io.File

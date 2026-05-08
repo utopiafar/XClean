@@ -1,4 +1,4 @@
-package com.xclean.app.services
+package com.utopiafar.xclean.services
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

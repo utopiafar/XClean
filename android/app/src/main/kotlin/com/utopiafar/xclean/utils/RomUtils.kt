@@ -1,4 +1,4 @@
-package com.xclean.app.utils
+package com.utopiafar.xclean.utils
 
 import android.os.Build
 

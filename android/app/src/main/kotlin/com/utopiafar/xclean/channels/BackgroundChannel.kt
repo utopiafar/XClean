@@ -1,11 +1,11 @@
-package com.xclean.app.channels
+package com.utopiafar.xclean.channels
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.xclean.app.services.AutoCleanWorker
+import com.utopiafar.xclean.services.AutoCleanWorker
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 /**
  * MethodChannel handler for background / auto-clean scheduling.
  *
- * Channel: com.xclean.app/background
+ * Channel: com.utopiafar.xclean/background
  *
  * Uses [WorkManager] to enqueue periodic work. Foreground-service integration
  * is stubbed for future expansion.
@@ -25,7 +25,7 @@ class BackgroundChannel(
 ) : MethodChannel.MethodCallHandler {
 
     companion object {
-        const val CHANNEL_NAME = "com.xclean.app/background"
+        const val CHANNEL_NAME = "com.utopiafar.xclean/background"
         const val AUTO_CLEAN_WORK_NAME = "xclean_auto_clean"
     }
 

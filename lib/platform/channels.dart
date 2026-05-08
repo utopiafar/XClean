@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 
 /// Platform channel constants matching Android native code
 class ChannelNames {
-  static const fileChannel = 'com.xclean.app/file';
-  static const permissionChannel = 'com.xclean.app/permission';
-  static const backgroundChannel = 'com.xclean.app/background';
+  static const fileChannel = 'com.utopiafar.xclean/file';
+  static const permissionChannel = 'com.utopiafar.xclean/permission';
+  static const backgroundChannel = 'com.utopiafar.xclean/background';
 }
 
 /// File scan result from native
@@ -42,7 +42,7 @@ class NativeScanResult {
 /// File operation channel
 class FileChannel {
   static const _channel = MethodChannel(ChannelNames.fileChannel);
-  static const _eventChannel = EventChannel('com.xclean.app/file_events');
+  static const _eventChannel = EventChannel('com.utopiafar.xclean/file_events');
 
   /// Scan files in a path with optional pattern
   static Future<List<NativeScanResult>> scanPath({

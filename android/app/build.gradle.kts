@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.xclean.app"
+    namespace = "com.utopiafar.xclean"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.xclean.app"
+        applicationId = "com.utopiafar.xclean"
         minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

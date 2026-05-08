@@ -1,4 +1,4 @@
-package com.xclean.app.channels
+package com.utopiafar.xclean.channels
 
 import android.app.Activity
 import android.content.Context
@@ -10,9 +10,9 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import com.xclean.app.engine.RootFileEngine
-import com.xclean.app.engine.ShizukuFileEngine
-import com.xclean.app.utils.RomUtils
+import com.utopiafar.xclean.engine.RootFileEngine
+import com.utopiafar.xclean.engine.ShizukuFileEngine
+import com.utopiafar.xclean.utils.RomUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -20,7 +20,7 @@ import io.flutter.plugin.common.MethodChannel
 /**
  * MethodChannel handler for permission-related operations.
  *
- * Channel: com.xclean.app/permission
+ * Channel: com.utopiafar.xclean/permission
  */
 class PermissionChannel(
     private val context: Context,
@@ -28,7 +28,7 @@ class PermissionChannel(
 ) : MethodChannel.MethodCallHandler {
 
     companion object {
-        const val CHANNEL_NAME = "com.xclean.app/permission"
+        const val CHANNEL_NAME = "com.utopiafar.xclean/permission"
         private const val STATUS_GRANTED = "granted"
         private const val STATUS_DENIED = "denied"
         private const val STATUS_PARTIAL = "partial"

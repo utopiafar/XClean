@@ -1,9 +1,9 @@
-package com.xclean.app.channels
+package com.utopiafar.xclean.channels
 
 import android.os.Environment
 import android.os.StatFs
-import com.xclean.app.engine.RootFileEngine
-import com.xclean.app.engine.ShizukuFileEngine
+import com.utopiafar.xclean.engine.RootFileEngine
+import com.utopiafar.xclean.engine.ShizukuFileEngine
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * MethodChannel + EventChannel handler for file-system operations.
  *
  * Channels:
- *   MethodChannel  -> com.xclean.app/file
- *   EventChannel   -> com.xclean.app/file_events
+ *   MethodChannel  -> com.utopiafar.xclean/file
+ *   EventChannel   -> com.utopiafar.xclean/file_events
  *
  * Supported engines: "normal" (standard java.io.File API).
  */
@@ -26,8 +26,8 @@ class FileChannel(
 ) : MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
     companion object {
-        const val CHANNEL_NAME = "com.xclean.app/file"
-        const val EVENT_CHANNEL_NAME = "com.xclean.app/file_events"
+        const val CHANNEL_NAME = "com.utopiafar.xclean/file"
+        const val EVENT_CHANNEL_NAME = "com.utopiafar.xclean/file_events"
         private const val ENGINE_NORMAL = "normal"
         private const val ENGINE_SHIZUKU = "shizuku"
         private const val ENGINE_ROOT = "root"

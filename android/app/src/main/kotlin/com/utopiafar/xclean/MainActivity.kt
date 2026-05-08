@@ -1,10 +1,10 @@
-package com.xclean.app
+package com.utopiafar.xclean
 
 import android.content.Intent
 import android.os.Bundle
-import com.xclean.app.channels.BackgroundChannel
-import com.xclean.app.channels.FileChannel
-import com.xclean.app.channels.PermissionChannel
+import com.utopiafar.xclean.channels.BackgroundChannel
+import com.utopiafar.xclean.channels.FileChannel
+import com.utopiafar.xclean.channels.PermissionChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 
