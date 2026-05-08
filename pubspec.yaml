@@ -1,0 +1,54 @@
+name: xclean
+description: "A lightweight and powerful file cleaner for Android."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Routing
+  go_router: ^14.8.1
+
+  # Database
+  drift: ^2.26.0
+  drift_flutter: ^0.2.4
+  sqlite3_flutter_libs: ^0.5.32
+
+  # Permissions
+  permission_handler: ^12.0.0+1
+
+  # Path
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Utilities
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+  intl: ^0.20.0
+  device_info_plus: ^11.4.0
+
+  # Notifications
+  flutter_local_notifications: ^19.4.0
+
+  # WorkManager
+  workmanager: ^0.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
+  drift_dev: ^2.26.0
+  freezed: ^3.0.6
+  json_serializable: ^6.9.5
+
+flutter:
+  uses-material-design: true
