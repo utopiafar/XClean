@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xclean/l10n/app_localizations.dart';
+import '../../../core/utils/localization_helper.dart';
 import '../../../domain/entities/clean_rule.dart';
 import '../../providers/dashboard_provider.dart';
 import 'rule_editor_screen.dart';
@@ -9,15 +11,16 @@ class RuleListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final rulesAsync = ref.watch(allRulesProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('清理规则'),
+        title: Text(l10n.ruleListTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: '新建规则',
+            tooltip: l10n.newRule,
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(
                 builder: (_) => const RuleEditorScreen(),
@@ -29,7 +32,7 @@ class RuleListScreen extends ConsumerWidget {
       body: rulesAsync.when(
         data: (rules) {
           if (rules.isEmpty) {
-            return const Center(child: Text('暂无规则'));
+            return Center(child: Text(l10n.noRules));
           }
 
           final presetRules = rules.where((r) => r.id <= 5 && r.id > 0).toList();
@@ -39,18 +42,18 @@ class RuleListScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             children: [
               if (presetRules.isNotEmpty) ...[
-                _buildSectionHeader(context, '预设规则'),
+                _buildSectionHeader(context, l10n.presetRules),
                 ...presetRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule)),
               ],
               if (customRules.isNotEmpty) ...[
-                _buildSectionHeader(context, '自定义规则'),
+                _buildSectionHeader(context, l10n.customRules),
                 ...customRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule)),
               ],
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('加载失败: $e')),
+        error: (e, _) => Center(child: Text(AppLocalizations.of(context)!.loadFailed('$e'))),
       ),
     );
   }
@@ -76,12 +79,8 @@ class _RuleCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final engineLabel = switch (rule.scope.engine) {
-      'normal' => '普通权限',
-      'shizuku' => 'Shizuku',
-      'root' => 'Root',
-      _ => '自动',
-    };
+    final l10n = AppLocalizations.of(context)!;
+    final engineLabel = _engineLabel(rule.scope.engine, l10n);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -95,13 +94,13 @@ class _RuleCard extends ConsumerWidget {
             ref.invalidate(enabledRulesProvider);
           },
         ),
-        title: Text(rule.name),
+        title: Text(localizePresetName(context, rule.name)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (rule.description != null)
               Text(
-                rule.description!,
+                localizePresetDesc(context, rule.description!),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 12),
@@ -117,7 +116,7 @@ class _RuleCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 4),
                 Chip(
-                  label: Text('优先级 ${rule.priority}', style: const TextStyle(fontSize: 10)),
+                  label: Text(l10n.priorityLabel(rule.priority), style: const TextStyle(fontSize: 10)),
                   padding: EdgeInsets.zero,
                   visualDensity: VisualDensity.compact,
                   backgroundColor: Colors.grey.withAlpha(40),
@@ -130,7 +129,7 @@ class _RuleCard extends ConsumerWidget {
         isThreeLine: true,
         trailing: IconButton(
           icon: const Icon(Icons.edit_outlined),
-          tooltip: '编辑规则',
+          tooltip: l10n.editRule,
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(
               builder: (_) => RuleEditorScreen(ruleId: rule.id),
@@ -139,6 +138,15 @@ class _RuleCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _engineLabel(String engine, AppLocalizations l10n) {
+    return switch (engine) {
+      'normal' => l10n.normalPermission,
+      'shizuku' => 'Shizuku',
+      'root' => 'Root',
+      _ => l10n.auto,
+    };
   }
 
   Color _engineColor(String engine) {

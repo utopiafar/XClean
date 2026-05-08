@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_constants.dart';
+import 'package:xclean/l10n/app_localizations.dart';
+import '../../../core/utils/localization_helper.dart';
 import '../../../core/utils/size_formatter.dart';
 import '../../../domain/entities/clean_log.dart';
 import '../../../domain/entities/clean_rule.dart';
@@ -35,6 +36,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final storageAsync = ref.watch(storageInfoProvider);
     final enabledRulesAsync = ref.watch(enabledRulesProvider);
     final recentLogsAsync = ref.watch(recentLogsProvider);
@@ -43,11 +45,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.appName),
+        title: Text(l10n.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            tooltip: '设置',
+            tooltip: l10n.settings,
             onPressed: () => context.push('/settings'),
           ),
         ],
@@ -64,17 +66,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: [
             const PermissionBanner(),
             const SizedBox(height: 16),
-            _buildStorageCard(storageAsync),
+            _buildStorageCard(storageAsync, l10n),
             const SizedBox(height: 16),
-            _buildQuickActions(enabledRulesAsync, scanState),
+            _buildQuickActions(enabledRulesAsync, scanState, l10n),
             const SizedBox(height: 16),
-            _buildEnabledRulesCard(enabledRulesAsync),
+            _buildEnabledRulesCard(enabledRulesAsync, l10n),
             const SizedBox(height: 16),
-            _buildRecentLogsCard(recentLogsAsync),
+            _buildRecentLogsCard(recentLogsAsync, l10n),
             const SizedBox(height: 8),
             romTypeAsync.when(
               data: (rom) => Text(
-                '检测到系统: $rom',
+                l10n.romDetected(rom),
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -87,7 +89,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildStorageCard(AsyncValue<Map<String, dynamic>> storageAsync) {
+  Widget _buildStorageCard(AsyncValue<Map<String, dynamic>> storageAsync, AppLocalizations l10n) {
     return storageAsync.when(
       data: (info) {
         final total = info['totalBytes'] as int? ?? 1;
@@ -105,14 +107,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildStorageStat('已用', formatBytes(used), Colors.orange),
+                    _buildStorageStat(l10n.used, formatBytes(used), Colors.orange),
                     const SizedBox(width: 32),
-                    _buildStorageStat('可用', formatBytes(free), Colors.green),
+                    _buildStorageStat(l10n.available, formatBytes(free), Colors.green),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '总计: ${formatBytes(total)}',
+                  '${l10n.total}: ${formatBytes(total)}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -129,7 +131,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       error: (e, _) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('无法获取存储信息: $e'),
+          child: Text(l10n.storageInfoError('$e')),
         ),
       ),
     );
@@ -153,6 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildQuickActions(
     AsyncValue<List<CleanRuleEntity>> rulesAsync,
     ScanState scanState,
+    AppLocalizations l10n,
   ) {
     final isScanning = scanState.isScanning;
 
@@ -162,7 +165,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('快捷操作', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.quickActions, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -175,7 +178,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             if (rules.isEmpty) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('没有启用的规则，请先启用规则')),
+                                  SnackBar(content: Text(l10n.noEnabledRules)),
                                 );
                               }
                               return;
@@ -187,7 +190,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 context.push('/preview');
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('没有匹配到可清理的文件')),
+                                  SnackBar(content: Text(l10n.noMatchedFiles)),
                                 );
                               }
                             }
@@ -199,7 +202,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
                         : const Icon(Icons.cleaning_services),
-                    label: Text(isScanning ? '扫描中...' : '一键扫描'),
+                    label: Text(isScanning ? l10n.scanning : l10n.oneKeyScan),
                   ),
                 ),
               ],
@@ -211,7 +214,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => context.push('/rules'),
                     icon: const Icon(Icons.rule_folder_outlined),
-                    label: const Text('规则管理'),
+                    label: Text(l10n.ruleManagement),
                   ),
                 ),
               ],
@@ -223,7 +226,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => context.push('/auto_tasks'),
                     icon: const Icon(Icons.schedule_outlined),
-                    label: const Text('自动清理'),
+                    label: Text(l10n.autoClean),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -231,7 +234,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => context.push('/large_files'),
                     icon: const Icon(Icons.folder_open_outlined),
-                    label: const Text('大文件'),
+                    label: Text(l10n.largeFiles),
                   ),
                 ),
               ],
@@ -242,7 +245,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildEnabledRulesCard(AsyncValue<List<CleanRuleEntity>> rulesAsync) {
+  Widget _buildEnabledRulesCard(AsyncValue<List<CleanRuleEntity>> rulesAsync, AppLocalizations l10n) {
     return rulesAsync.when(
       data: (rules) {
         if (rules.isEmpty) {
@@ -257,10 +260,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('已启用规则', style: Theme.of(context).textTheme.titleMedium),
+                    Text(l10n.enabledRules, style: Theme.of(context).textTheme.titleMedium),
                     TextButton(
                       onPressed: () => context.push('/rules'),
-                      child: const Text('查看全部'),
+                      child: Text(l10n.viewAll),
                     ),
                   ],
                 ),
@@ -268,16 +271,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ...rules.take(3).map((CleanRuleEntity rule) => ListTile(
                   dense: true,
                   leading: const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                  title: Text(rule.name, style: const TextStyle(fontSize: 14)),
+                  title: Text(localizePresetName(context, rule.name), style: const TextStyle(fontSize: 14)),
                   subtitle: rule.description != null
-                      ? Text(rule.description!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))
+                      ? Text(localizePresetDesc(context, rule.description!), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))
                       : null,
                 )),
                 if (rules.length > 3)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      '还有 ${rules.length - 3} 条规则...',
+                      l10n.moreRules(rules.length - 3),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -291,7 +294,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildRecentLogsCard(AsyncValue<List<CleanLogEntity>> logsAsync) {
+  Widget _buildRecentLogsCard(AsyncValue<List<CleanLogEntity>> logsAsync, AppLocalizations l10n) {
     return logsAsync.when(
       data: (logs) {
         if (logs.isEmpty) {
@@ -303,7 +306,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('最近清理', style: Theme.of(context).textTheme.titleMedium),
+                Text(l10n.recentCleanups, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
                 ...logs.take(3).map((CleanLogEntity log) {
                   return ListTile(
@@ -313,11 +316,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       size: 20,
                     ),
                     title: Text(
-                      '${formatBytes(log.results.freedBytes)} · ${log.results.fileCount} 个文件',
+                      '${formatBytes(log.results.freedBytes)} · ${log.results.fileCount} ${l10n.nFiles(log.results.fileCount)}',
                       style: const TextStyle(fontSize: 14),
                     ),
                     subtitle: Text(
-                      _formatTime(log.executedAt),
+                      _formatTime(log.executedAt, l10n),
                       style: const TextStyle(fontSize: 12),
                     ),
                   );
@@ -332,13 +335,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(DateTime dt, AppLocalizations l10n) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inHours < 1) return '${diff.inMinutes} 分钟前';
-    if (diff.inDays < 1) return '${diff.inHours} 小时前';
-    if (diff.inDays < 7) return '${diff.inDays} 天前';
+    if (diff.inMinutes < 1) return l10n.justNow;
+    if (diff.inHours < 1) return l10n.minutesAgo(diff.inMinutes);
+    if (diff.inDays < 1) return l10n.hoursAgo(diff.inHours);
+    if (diff.inDays < 7) return l10n.daysAgo(diff.inDays);
     return '${dt.month}/${dt.day}';
   }
 }

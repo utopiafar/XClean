@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../../core/utils/size_formatter.dart';
 import '../../../platform/channels.dart';
 
@@ -22,18 +22,19 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final filesAsync = ref.watch(largeFilesProvider('/storage/emulated/0'));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('大文件分析'),
+        title: Text(l10n.largeFileAnalysis),
         actions: [
           PopupMenuButton<String>(
             onSelected: (v) => setState(() => _sortBy = v),
             itemBuilder: (_) => [
-              const PopupMenuItem(value: 'size', child: Text('按大小排序')),
-              const PopupMenuItem(value: 'time', child: Text('按时间排序')),
-              const PopupMenuItem(value: 'name', child: Text('按名称排序')),
+              PopupMenuItem(value: 'size', child: Text(l10n.sortBySize)),
+              PopupMenuItem(value: 'time', child: Text(l10n.sortByTime)),
+              PopupMenuItem(value: 'name', child: Text(l10n.sortByName)),
             ],
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -50,7 +51,7 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('最小文件大小: $_minSizeMb MB', style: Theme.of(context).textTheme.bodyMedium),
+                Text(l10n.minFileSize(_minSizeMb), style: Theme.of(context).textTheme.bodyMedium),
                 Slider(
                   value: _minSizeMb.toDouble(),
                   min: 1,
@@ -79,7 +80,7 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
                 });
 
                 if (filtered.isEmpty) {
-                  return const Center(child: Text('没有找到符合条件的大文件'));
+                  return Center(child: Text(l10n.noLargeFiles));
                 }
 
                 return ListView.builder(
@@ -100,7 +101,7 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('扫描失败: $e')),
+              error: (e, _) => Center(child: Text(AppLocalizations.of(context)!.scanFailed('$e'))),
             ),
           ),
         ],
@@ -109,6 +110,7 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
   }
 
   void _showFileOptions(BuildContext context, NativeScanResult file) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -122,14 +124,14 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('删除此文件'),
+              title: Text(l10n.deleteThisFile),
               onTap: () async {
                 Navigator.pop(context);
                 final result = await FileChannel.deleteFiles([file.path]);
                 final success = (result['successCount'] as int? ?? 0) > 0;
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(success ? '已删除' : '删除失败')),
+                    SnackBar(content: Text(success ? l10n.deleted : l10n.deleteFailed)),
                   );
                   ref.invalidate(largeFilesProvider('/storage/emulated/0'));
                 }
@@ -137,7 +139,7 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.open_in_new),
-              title: const Text('查看所在目录'),
+              title: Text(l10n.viewDirectory),
               onTap: () {
                 Navigator.pop(context);
               },

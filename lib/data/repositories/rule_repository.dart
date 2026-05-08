@@ -35,8 +35,8 @@ class RuleRepository {
     final presets = [
       CleanRuleEntity(
         id: 0,
-        name: '缩略图缓存',
-        description: '清理 .thumbnails 目录中的图片缓存',
+        name: 'Thumbnail Cache',
+        description: 'Clean image cache in .thumbnails directory',
         enabled: true,
         priority: 10,
         scope: const RuleScope(
@@ -50,8 +50,8 @@ class RuleRepository {
       ),
       CleanRuleEntity(
         id: 0,
-        name: '空文件夹',
-        description: '递归清理空目录',
+        name: 'Empty Folders',
+        description: 'Recursively clean empty directories',
         enabled: true,
         priority: 20,
         scope: const RuleScope(
@@ -67,8 +67,8 @@ class RuleRepository {
       ),
       CleanRuleEntity(
         id: 0,
-        name: '下载临时文件',
-        description: '清理下载目录中的临时文件',
+        name: 'Download Temp Files',
+        description: 'Clean temporary files in download directory',
         enabled: true,
         priority: 30,
         scope: const RuleScope(
@@ -84,8 +84,8 @@ class RuleRepository {
       ),
       CleanRuleEntity(
         id: 0,
-        name: '日志文件',
-        description: '清理应用日志文件',
+        name: 'Log Files',
+        description: 'Clean application log files',
         enabled: false,
         priority: 40,
         scope: const RuleScope(
@@ -101,8 +101,8 @@ class RuleRepository {
       ),
       CleanRuleEntity(
         id: 0,
-        name: '应用残留',
-        description: '清理已卸载应用的残留目录',
+        name: 'App Residual',
+        description: 'Clean residual directories of uninstalled apps',
         enabled: false,
         priority: 50,
         scope: const RuleScope(

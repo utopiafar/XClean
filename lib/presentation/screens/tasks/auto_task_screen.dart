@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../../data/local/database.dart';
 import '../../../domain/entities/auto_task.dart';
 import '../../../domain/entities/clean_rule.dart';
@@ -26,12 +26,13 @@ class AutoTaskScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final tasksAsync = ref.watch(autoTasksProvider);
     final rulesAsync = ref.watch(allRulesProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('自动清理'),
+        title: Text(l10n.autoTaskTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -50,12 +51,12 @@ class AutoTaskScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.schedule, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
-                  const Text('没有配置自动清理任务'),
+                  Text(l10n.noAutoTasks),
                   const SizedBox(height: 8),
                   FilledButton.icon(
                     onPressed: () => _showTaskEditor(context, ref, null, rulesAsync.valueOrNull ?? []),
                     icon: const Icon(Icons.add),
-                    label: const Text('新建任务'),
+                    label: Text(l10n.newTask),
                   ),
                 ],
               ),
@@ -82,7 +83,7 @@ class AutoTaskScreen extends ConsumerWidget {
                     },
                   ),
                   title: Text(task.name),
-                  subtitle: Text('周期: ${_periodLabel(task.schedule.period)} · ${task.schedule.timeOfDay}'),
+                  subtitle: Text(l10n.periodLabel(_periodLabel(task.schedule.period, l10n), task.schedule.timeOfDay)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -100,17 +101,17 @@ class AutoTaskScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('加载失败: $e')),
+        error: (e, _) => Center(child: Text(AppLocalizations.of(context)!.loadFailed('$e'))),
       ),
     );
   }
 
-  String _periodLabel(String period) {
+  String _periodLabel(String period, AppLocalizations l10n) {
     return switch (period) {
-      'daily' => '每天',
-      '3days' => '每3天',
-      'weekly' => '每周',
-      'monthly' => '每月',
+      'daily' => l10n.daily,
+      '3days' => l10n.every3Days,
+      'weekly' => l10n.weekly,
+      'monthly' => l10n.monthly,
       _ => period,
     };
   }
@@ -164,6 +165,7 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -178,7 +180,7 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.task == null ? '新建自动任务' : '编辑自动任务',
+              Text(widget.task == null ? l10n.newAutoTask : l10n.editAutoTask,
                   style: Theme.of(context).textTheme.titleLarge),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -189,23 +191,23 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
           const Divider(),
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: '任务名称'),
+            decoration: InputDecoration(labelText: l10n.taskName),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _period,
-            decoration: const InputDecoration(labelText: '执行周期'),
-            items: const [
-              DropdownMenuItem(value: 'daily', child: Text('每天')),
-              DropdownMenuItem(value: '3days', child: Text('每3天')),
-              DropdownMenuItem(value: 'weekly', child: Text('每周')),
-              DropdownMenuItem(value: 'monthly', child: Text('每月')),
+            decoration: InputDecoration(labelText: l10n.executionPeriod),
+            items: [
+              DropdownMenuItem(value: 'daily', child: Text(l10n.daily)),
+              DropdownMenuItem(value: '3days', child: Text(l10n.every3Days)),
+              DropdownMenuItem(value: 'weekly', child: Text(l10n.weekly)),
+              DropdownMenuItem(value: 'monthly', child: Text(l10n.monthly)),
             ],
             onChanged: (v) => setState(() => _period = v!),
           ),
           const SizedBox(height: 12),
           ListTile(
-            title: const Text('执行时间'),
+            title: Text(l10n.executionTime),
             trailing: Text(_timeOfDay, style: Theme.of(context).textTheme.titleMedium),
             onTap: () async {
               final parts = _timeOfDay.split(':');
@@ -222,7 +224,7 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
             },
           ),
           const SizedBox(height: 12),
-          const Text('选择规则', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(l10n.selectRules, style: const TextStyle(fontWeight: FontWeight.bold)),
           ...widget.rules.where((r) => r.enabled).map((rule) => CheckboxListTile(
             dense: true,
             title: Text(rule.name),
@@ -237,24 +239,24 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
           )),
           const Divider(),
           SwitchListTile(
-            title: const Text('要求预览确认'),
-            subtitle: const Text('每次执行前通知并等待确认'),
+            title: Text(l10n.requirePreviewConfirm),
+            subtitle: Text(l10n.previewConfirmDesc),
             value: _requirePreview,
             onChanged: (v) => setState(() => _requirePreview = v),
           ),
           SwitchListTile(
-            title: const Text('使用前台服务保活'),
-            subtitle: const Text('提升国产 ROM 上的执行可靠性'),
+            title: Text(l10n.useForegroundService),
+            subtitle: Text(l10n.foregroundServiceDesc),
             value: _useForeground,
             onChanged: (v) => setState(() => _useForeground = v),
           ),
           SwitchListTile(
-            title: const Text('仅充电时执行'),
+            title: Text(l10n.onlyWhenCharging),
             value: _requireCharging,
             onChanged: (v) => setState(() => _requireCharging = v),
           ),
           ListTile(
-            title: const Text('最低电量'),
+            title: Text(l10n.minBatteryLevel),
             trailing: SizedBox(
               width: 120,
               child: Slider(
@@ -272,7 +274,7 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _saveTask,
-              child: const Text('保存任务'),
+              child: Text(l10n.saveTask),
             ),
           ),
           const SizedBox(height: 24),
@@ -282,15 +284,16 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
   }
 
   Future<void> _saveTask() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入任务名称')),
+        SnackBar(content: Text(l10n.taskNameRequired)),
       );
       return;
     }
     if (_selectedRuleIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请至少选择一条规则')),
+        SnackBar(content: Text(l10n.selectRulesRequired)),
       );
       return;
     }
@@ -320,7 +323,7 @@ class _TaskEditorSheetState extends ConsumerState<_TaskEditorSheet> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('自动任务已保存')),
+        SnackBar(content: Text(l10n.taskSaved)),
       );
     }
   }

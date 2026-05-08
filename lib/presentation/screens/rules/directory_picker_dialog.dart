@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../../platform/channels.dart';
 
 /// A simple directory picker dialog that uses dart:io directly.
@@ -10,7 +11,7 @@ class DirectoryPickerDialog extends StatefulWidget {
   const DirectoryPickerDialog({
     super.key,
     this.initialPath = '/storage/emulated/0',
-    this.title = '选择目录',
+    this.title = '',
   });
 
   @override
@@ -70,7 +71,7 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
       });
     } catch (e) {
       setState(() {
-        _error = '读取目录失败: $e';
+        _error = AppLocalizations.of(context)!.loadDirectoryFailed('$e');
         _loading = false;
       });
     }
@@ -97,8 +98,9 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(widget.title),
+      title: Text(widget.title.isEmpty ? l10n.selectDirectory : widget.title),
       contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
       content: SizedBox(
         width: double.maxFinite,
@@ -112,7 +114,7 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_upward),
-                    tooltip: '上级目录',
+                    tooltip: l10n.goUp,
                     onPressed: _canGoUp() ? _goUp : null,
                   ),
                   Expanded(
@@ -129,7 +131,7 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
             const Divider(height: 1),
             // Directory list
             Expanded(
-              child: _buildBody(),
+              child: _buildBody(l10n),
             ),
           ],
         ),
@@ -137,11 +139,11 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(_currentPath),
-          child: const Text('选择此目录'),
+          child: Text(l10n.selectThisDirectory),
         ),
       ],
     );
@@ -152,7 +154,7 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
     return parent != _currentPath;
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AppLocalizations l10n) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -167,7 +169,7 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
     }
 
     if (_items.isEmpty) {
-      return const Center(child: Text('此目录为空'));
+      return Center(child: Text(l10n.thisDirectoryIsEmpty));
     }
 
     return ListView.builder(

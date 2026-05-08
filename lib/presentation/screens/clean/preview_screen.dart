@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../../core/utils/size_formatter.dart';
 import '../../../domain/entities/clean_log.dart';
 import '../../providers/dashboard_provider.dart';
@@ -10,6 +11,7 @@ class PreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final scanState = ref.watch(scanProvider);
     final files = scanState.files;
     final selectedCount = files.where((f) => f.selected).length;
@@ -17,15 +19,15 @@ class PreviewScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('清理预览'),
+        title: Text(l10n.cleanPreview),
         actions: [
           TextButton(
             onPressed: () => ref.read(scanProvider.notifier).selectAll(true),
-            child: const Text('全选'),
+            child: Text(l10n.selectAll),
           ),
           TextButton(
             onPressed: () => ref.read(scanProvider.notifier).selectAll(false),
-            child: const Text('全不选'),
+            child: Text(l10n.selectNone),
           ),
         ],
       ),
@@ -41,11 +43,11 @@ class PreviewScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '已选择 $selectedCount / ${files.length} 个文件',
+                        l10n.selectedCount(selectedCount, files.length),
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       Text(
-                        '可释放 ${formatBytes(selectedSize)}',
+                        l10n.releasable(formatBytes(selectedSize)),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -58,7 +60,7 @@ class PreviewScreen extends ConsumerWidget {
           ),
           Expanded(
             child: files.isEmpty
-                ? const Center(child: Text('没有匹配的文件'))
+                ? Center(child: Text(l10n.noMatchedFilesPreview))
                 : ListView.builder(
                     itemCount: files.length,
                     itemBuilder: (context, index) {
@@ -72,7 +74,7 @@ class PreviewScreen extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          '${file.isDirectory ? "目录" : formatBytes(file.size)} · ${_formatDate(file.lastModified)}',
+                          '${file.isDirectory ? l10n.directory : formatBytes(file.size)} · ${_formatDate(file.lastModified)}',
                           style: const TextStyle(fontSize: 12),
                         ),
                         secondary: Icon(
@@ -94,7 +96,7 @@ class PreviewScreen extends ConsumerWidget {
                         ref.read(scanProvider.notifier).clear();
                         context.pop();
                       },
-                      child: const Text('取消'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -105,7 +107,7 @@ class PreviewScreen extends ConsumerWidget {
                           ? null
                           : () => _executeClean(context, ref),
                       icon: const Icon(Icons.delete_outline),
-                      label: Text('清理 (${formatBytes(selectedSize)})'),
+                      label: Text(l10n.cleanWithSize(formatBytes(selectedSize))),
                     ),
                   ),
                 ],
@@ -122,20 +124,21 @@ class PreviewScreen extends ConsumerWidget {
   }
 
   Future<void> _executeClean(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final notifier = ref.read(scanProvider.notifier);
     final startTime = DateTime.now();
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const PopScope(
+      builder: (_) => PopScope(
         canPop: false,
         child: AlertDialog(
           content: Row(
             children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text('正在清理...'),
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Text(l10n.cleaning),
             ],
           ),
         ),
@@ -165,15 +168,15 @@ class PreviewScreen extends ConsumerWidget {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text('清理完成'),
+            title: Text(l10n.cleanComplete),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('释放空间: ${formatBytes(finalResult.freedBytes)}'),
-                Text('文件数量: ${finalResult.fileCount}'),
-                Text('成功: ${finalResult.successCount}  失败: ${finalResult.failCount}'),
-                Text('耗时: ${formatDuration(finalResult.durationMs)}'),
+                Text(l10n.releasedSpace(formatBytes(finalResult.freedBytes))),
+                Text(l10n.fileCount(finalResult.fileCount)),
+                Text(l10n.successFailCount(finalResult.successCount, finalResult.failCount)),
+                Text(l10n.duration(formatDuration(finalResult.durationMs))),
               ],
             ),
             actions: [
@@ -182,7 +185,7 @@ class PreviewScreen extends ConsumerWidget {
                   Navigator.of(context).pop();
                   context.go('/');
                 },
-                child: const Text('确定'),
+                child: Text(l10n.confirm),
               ),
             ],
           ),
@@ -192,7 +195,7 @@ class PreviewScreen extends ConsumerWidget {
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('清理失败: $e')),
+          SnackBar(content: Text(l10n.cleanFailed('$e'))),
         );
       }
     }

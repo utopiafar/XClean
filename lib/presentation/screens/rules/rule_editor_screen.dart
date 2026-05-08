@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../../domain/entities/clean_rule.dart';
 import '../../providers/dashboard_provider.dart';
 import 'directory_picker_dialog.dart';
@@ -97,13 +98,14 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.ruleId == null ? '新建规则' : '编辑规则'),
+        title: Text(widget.ruleId == null ? l10n.newRuleTitle : l10n.editRuleTitle),
         actions: [
           TextButton(
             onPressed: _saveRule,
-            child: const Text('保存', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.save, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -112,24 +114,24 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _buildSection('基本信息', [
+            _buildSection(l10n.basicInfo, [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: '规则名称', hintText: '例如：清理日志文件'),
-                validator: (v) => v == null || v.isEmpty ? '请输入名称' : null,
+                decoration: InputDecoration(labelText: l10n.ruleName, hintText: l10n.ruleNameHint),
+                validator: (v) => v == null || v.isEmpty ? l10n.nameRequired : null,
               ),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(labelText: '描述（可选）'),
+                decoration: InputDecoration(labelText: l10n.description),
               ),
               SwitchListTile(
-                title: const Text('启用此规则'),
+                title: Text(l10n.enableThisRule),
                 value: _enabled,
                 onChanged: (v) => setState(() => _enabled = v),
               ),
               ListTile(
-                title: const Text('优先级'),
-                subtitle: Text('$_priority（数字越小优先级越高）'),
+                title: Text(l10n.priority),
+                subtitle: Text(l10n.priorityDesc(_priority)),
                 trailing: SizedBox(
                   width: 120,
                   child: Slider(
@@ -143,7 +145,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
                 ),
               ),
             ]),
-            _buildSection('作用范围', [
+            _buildSection(l10n.scope, [
               ..._pathControllers.asMap().entries.map((entry) {
                 final index = entry.key;
                 final controller = entry.value;
@@ -153,11 +155,11 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
                       child: TextFormField(
                         controller: controller,
                         decoration: InputDecoration(
-                          labelText: '路径 ${index + 1}',
-                          hintText: '/storage/emulated/0/...',
+                          labelText: l10n.pathLabel(index + 1),
+                          hintText: l10n.pathHint,
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.folder_open_outlined),
-                            tooltip: '浏览目录',
+                            tooltip: l10n.browseDirectory,
                             onPressed: () async {
                               final path = await DirectoryPickerDialog.show(
                                 context,
@@ -171,7 +173,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
                             },
                           ),
                         ),
-                        validator: (v) => v == null || v.isEmpty ? '请输入路径' : null,
+                        validator: (v) => v == null || v.isEmpty ? l10n.pathRequired : null,
                       ),
                     ),
                     if (_pathControllers.length > 1)
@@ -188,71 +190,71 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
               TextButton.icon(
                 onPressed: () => setState(() => _pathControllers.add(TextEditingController())),
                 icon: const Icon(Icons.add),
-                label: const Text('添加路径'),
+                label: Text(l10n.addPath),
               ),
               SwitchListTile(
-                title: const Text('递归子目录'),
+                title: Text(l10n.recursiveSubdirs),
                 value: _recursive,
                 onChanged: (v) => setState(() => _recursive = v),
               ),
               ListTile(
-                title: const Text('权限引擎'),
-                subtitle: Text(_engineLabel(_engine)),
+                title: Text(l10n.permissionEngine),
+                subtitle: Text(_engineLabel(_engine, l10n)),
                 trailing: DropdownButton<String>(
                   value: _engine,
-                  items: const [
-                    DropdownMenuItem(value: 'normal', child: Text('普通权限')),
-                    DropdownMenuItem(value: 'shizuku', child: Text('Shizuku')),
-                    DropdownMenuItem(value: 'root', child: Text('Root')),
+                  items: [
+                    DropdownMenuItem(value: 'normal', child: Text(l10n.normalPermission)),
+                    const DropdownMenuItem(value: 'shizuku', child: Text('Shizuku')),
+                    const DropdownMenuItem(value: 'root', child: Text('Root')),
                   ],
                   onChanged: (v) => setState(() => _engine = v!),
                 ),
               ),
             ]),
-            _buildSection('匹配条件', [
+            _buildSection(l10n.matchConditions, [
               if (_conditions.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('未添加条件（将匹配所有文件）', style: TextStyle(color: Colors.grey)),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(l10n.noConditions, style: const TextStyle(color: Colors.grey)),
                 ),
               ..._conditions.asMap().entries.map((entry) {
                 final index = entry.key;
                 final condition = entry.value;
-                return _buildConditionCard(index, condition);
+                return _buildConditionCard(index, condition, l10n);
               }),
               const SizedBox(height: 8),
-              _buildAddConditionMenu(),
+              _buildAddConditionMenu(l10n),
             ]),
-            _buildSection('执行动作', [
+            _buildSection(l10n.actionType, [
               ListTile(
-                title: const Text('动作类型'),
+                title: Text(l10n.actionType),
                 trailing: DropdownButton<String>(
                   value: _actionType,
-                  items: const [
-                    DropdownMenuItem(value: 'delete', child: Text('删除')),
-                    DropdownMenuItem(value: 'shred', child: Text('粉碎删除')),
+                  items: [
+                    DropdownMenuItem(value: 'delete', child: Text(l10n.deleteAction)),
+                    DropdownMenuItem(value: 'shred', child: Text(l10n.shredAction)),
                   ],
                   onChanged: (v) => setState(() => _actionType = v!),
                 ),
               ),
               if (_actionType == 'shred')
                 ListTile(
-                  title: const Text('覆写次数'),
+                  title: Text(l10n.passesCount),
                   trailing: DropdownButton<int>(
                     value: _shredPasses,
-                    items: [1, 3, 5, 7].map((n) => DropdownMenuItem(value: n, child: Text('$n 次'))).toList(),
+                    items: [1, 3, 5, 7].map((n) => DropdownMenuItem(value: n, child: Text(l10n.passesCountLabel(n)))).toList(),
                     onChanged: (v) => setState(() => _shredPasses = v!),
                   ),
                 ),
             ]),
-            _buildSection('安全策略', [
+            _buildSection(l10n.safetyPolicy, [
               SwitchListTile(
-                title: const Text('首次执行要求预览'),
+                title: Text(l10n.requirePreview),
                 value: _requirePreview,
                 onChanged: (v) => setState(() => _requirePreview = v),
               ),
               ListTile(
-                title: const Text('最少匹配数量'),
+                title: Text(l10n.minMatchCount),
                 trailing: SizedBox(
                   width: 80,
                   child: TextFormField(
@@ -272,10 +274,10 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
                       child: TextFormField(
                         controller: controller,
                         decoration: InputDecoration(
-                          labelText: '排除路径 ${index + 1}',
+                          labelText: l10n.excludedPathLabel(index + 1),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.folder_open_outlined),
-                            tooltip: '浏览目录',
+                            tooltip: l10n.browseDirectory,
                             onPressed: () async {
                               final path = await DirectoryPickerDialog.show(
                                 context,
@@ -304,7 +306,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
               TextButton.icon(
                 onPressed: () => setState(() => _excludedPathControllers.add(TextEditingController())),
                 icon: const Icon(Icons.add),
-                label: const Text('添加排除路径'),
+                label: Text(l10n.addExcludedPath),
               ),
             ]),
             const SizedBox(height: 32),
@@ -331,7 +333,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
     );
   }
 
-  Widget _buildConditionCard(int index, _MatchConditionForm condition) {
+  Widget _buildConditionCard(int index, _MatchConditionForm condition, AppLocalizations l10n) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -343,7 +345,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('条件 ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(l10n.conditionLabel(index + 1), style: const TextStyle(fontWeight: FontWeight.bold)),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, size: 20),
                   onPressed: () => setState(() => _conditions.removeAt(index)),
@@ -353,17 +355,17 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
             if (condition.type == 'filename') ...[
               TextFormField(
                 initialValue: condition.pattern,
-                decoration: const InputDecoration(labelText: '文件名模式', hintText: '*.log'),
+                decoration: InputDecoration(labelText: l10n.filenamePattern, hintText: l10n.filenamePatternHint),
                 onChanged: (v) => condition.pattern = v,
               ),
               DropdownButtonFormField<String>(
                 value: condition.mode ?? 'wildcard',
-                decoration: const InputDecoration(labelText: '匹配模式'),
-                items: const [
-                  DropdownMenuItem(value: 'wildcard', child: Text('通配符 (*, ?)')),
-                  DropdownMenuItem(value: 'regex', child: Text('正则表达式')),
-                  DropdownMenuItem(value: 'contains', child: Text('包含文本')),
-                  DropdownMenuItem(value: 'exact', child: Text('精确匹配')),
+                decoration: InputDecoration(labelText: l10n.matchMode),
+                items: [
+                  DropdownMenuItem(value: 'wildcard', child: Text(l10n.wildcardMode)),
+                  DropdownMenuItem(value: 'regex', child: Text(l10n.regexMode)),
+                  DropdownMenuItem(value: 'contains', child: Text(l10n.containsMode)),
+                  DropdownMenuItem(value: 'exact', child: Text(l10n.exactMode)),
                 ],
                 onChanged: (v) => setState(() => condition.mode = v),
               ),
@@ -371,26 +373,26 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
             if (condition.type == 'extension') ...[
               TextFormField(
                 initialValue: condition.extensions,
-                decoration: const InputDecoration(labelText: '扩展名（逗号分隔）', hintText: 'log, tmp, txt'),
+                decoration: InputDecoration(labelText: l10n.extensionsLabel, hintText: l10n.extensionsHint),
                 onChanged: (v) => condition.extensions = v,
               ),
             ],
             if (condition.type == 'size') ...[
               DropdownButtonFormField<String>(
                 value: condition.operator ?? '>',
-                decoration: const InputDecoration(labelText: '比较方式'),
-                items: const [
-                  DropdownMenuItem(value: '>', child: Text('大于')),
-                  DropdownMenuItem(value: '>=', child: Text('大于等于')),
-                  DropdownMenuItem(value: '<', child: Text('小于')),
-                  DropdownMenuItem(value: '<=', child: Text('小于等于')),
-                  DropdownMenuItem(value: '==', child: Text('等于')),
+                decoration: InputDecoration(labelText: l10n.compareMethod),
+                items: [
+                  DropdownMenuItem(value: '>', child: Text(l10n.greaterThan)),
+                  DropdownMenuItem(value: '>=', child: Text(l10n.greaterThanOrEqual)),
+                  DropdownMenuItem(value: '<', child: Text(l10n.lessThan)),
+                  DropdownMenuItem(value: '<=', child: Text(l10n.lessThanOrEqual)),
+                  DropdownMenuItem(value: '==', child: Text(l10n.equal)),
                 ],
                 onChanged: (v) => setState(() => condition.operator = v),
               ),
               TextFormField(
                 initialValue: condition.sizeValue,
-                decoration: const InputDecoration(labelText: '大小（字节）'),
+                decoration: InputDecoration(labelText: l10n.sizeInBytes),
                 keyboardType: TextInputType.number,
                 onChanged: (v) => condition.sizeValue = v,
               ),
@@ -398,33 +400,33 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
             if (condition.type == 'modifiedTime') ...[
               DropdownButtonFormField<String>(
                 value: condition.operator ?? '>',
-                decoration: const InputDecoration(labelText: '比较方式'),
-                items: const [
-                  DropdownMenuItem(value: '>', child: Text('早于')),
-                  DropdownMenuItem(value: '<', child: Text('晚于')),
+                decoration: InputDecoration(labelText: l10n.compareMethod),
+                items: [
+                  DropdownMenuItem(value: '>', child: Text(l10n.olderThan)),
+                  DropdownMenuItem(value: '<', child: Text(l10n.newerThan)),
                 ],
                 onChanged: (v) => setState(() => condition.operator = v),
               ),
               TextFormField(
                 initialValue: condition.timeValue,
-                decoration: const InputDecoration(labelText: '时间（如 7d, 24h, 30m）'),
+                decoration: InputDecoration(labelText: l10n.timeFormatHint),
                 onChanged: (v) => condition.timeValue = v,
               ),
             ],
             if (condition.type == 'subfileCount') ...[
               DropdownButtonFormField<String>(
                 value: condition.operator ?? '==',
-                decoration: const InputDecoration(labelText: '比较方式'),
-                items: const [
-                  DropdownMenuItem(value: '==', child: Text('等于')),
-                  DropdownMenuItem(value: '>', child: Text('大于')),
-                  DropdownMenuItem(value: '<', child: Text('小于')),
+                decoration: InputDecoration(labelText: l10n.compareMethod),
+                items: [
+                  DropdownMenuItem(value: '==', child: Text(l10n.equal)),
+                  DropdownMenuItem(value: '>', child: Text(l10n.greaterThan)),
+                  DropdownMenuItem(value: '<', child: Text(l10n.lessThan)),
                 ],
                 onChanged: (v) => setState(() => condition.operator = v),
               ),
               TextFormField(
                 initialValue: condition.countValue,
-                decoration: const InputDecoration(labelText: '子文件数量'),
+                decoration: InputDecoration(labelText: l10n.subfileCountLabel),
                 keyboardType: TextInputType.number,
                 onChanged: (v) => condition.countValue = v,
               ),
@@ -435,37 +437,38 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
     );
   }
 
-  Widget _buildAddConditionMenu() {
+  Widget _buildAddConditionMenu(AppLocalizations l10n) {
     return PopupMenuButton<String>(
       onSelected: (type) => setState(() => _conditions.add(_MatchConditionForm(type: type))),
-      itemBuilder: (_) => const [
-        PopupMenuItem(value: 'filename', child: Text('文件名')),
-        PopupMenuItem(value: 'extension', child: Text('扩展名')),
-        PopupMenuItem(value: 'size', child: Text('文件大小')),
-        PopupMenuItem(value: 'modifiedTime', child: Text('修改时间')),
-        PopupMenuItem(value: 'subfileCount', child: Text('子文件数量')),
+      itemBuilder: (_) => [
+        PopupMenuItem(value: 'filename', child: Text(l10n.filenameCondition)),
+        PopupMenuItem(value: 'extension', child: Text(l10n.extensionCondition)),
+        PopupMenuItem(value: 'size', child: Text(l10n.fileSizeCondition)),
+        PopupMenuItem(value: 'modifiedTime', child: Text(l10n.modifiedTimeCondition)),
+        PopupMenuItem(value: 'subfileCount', child: Text(l10n.subfileCountCondition)),
       ],
-      child: const Chip(
-        avatar: Icon(Icons.add, size: 18),
-        label: Text('添加条件'),
+      child: Chip(
+        avatar: const Icon(Icons.add, size: 18),
+        label: Text(l10n.addCondition),
       ),
     );
   }
 
-  String _engineLabel(String engine) {
+  String _engineLabel(String engine, AppLocalizations l10n) {
     return switch (engine) {
-      'normal' => '普通权限',
+      'normal' => l10n.normalPermission,
       'shizuku' => 'Shizuku',
       'root' => 'Root',
-      _ => '普通权限',
+      _ => l10n.normalPermission,
     };
   }
 
   Future<void> _saveRule() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     if (_pathControllers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请至少添加一个路径')),
+        SnackBar(content: Text(l10n.pleaseAddAtLeastOnePath)),
       );
       return;
     }
@@ -523,7 +526,7 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('规则已保存')),
+        SnackBar(content: Text(l10n.ruleSaved)),
       );
       context.pop();
     }

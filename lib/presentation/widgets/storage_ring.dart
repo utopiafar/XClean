@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import 'dart:math' as math;
 
 class StorageRing extends StatelessWidget {
@@ -13,6 +14,7 @@ class StorageRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = percent > 0.9
         ? Colors.red
         : percent > 0.7
@@ -37,7 +39,7 @@ class StorageRing extends StatelessWidget {
                 ),
               ),
               Text(
-                '已用',
+                l10n.used,
                 style: TextStyle(
                   fontSize: size * 0.1,
                   color: Colors.grey,

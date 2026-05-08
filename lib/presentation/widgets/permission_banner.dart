@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xclean/l10n/app_localizations.dart';
 import '../../platform/channels.dart';
 import '../providers/dashboard_provider.dart';
 
@@ -8,6 +9,7 @@ class PermissionBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final permissionAsync = ref.watch(permissionStatusProvider);
 
     return permissionAsync.when(
@@ -30,14 +32,14 @@ class PermissionBanner extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '需要存储权限',
+                        l10n.storagePermissionNeeded,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
                       ),
                       Text(
-                        'XClean 需要访问所有文件才能执行清理',
+                        l10n.storagePermissionRequired,
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).colorScheme.onErrorContainer,
@@ -56,7 +58,7 @@ class PermissionBanner extends ConsumerWidget {
                       await PermissionChannel.openAppSettings();
                     }
                   },
-                  child: const Text('授权'),
+                  child: Text(l10n.grantPermission),
                 ),
               ],
             ),

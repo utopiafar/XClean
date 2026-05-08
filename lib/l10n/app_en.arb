@@ -1,0 +1,323 @@
+{
+  "@@locale": "en",
+  "appName": "XClean",
+  "storagePermissionRequired": "XClean needs access to all files to perform cleanup",
+  "grantPermission": "Grant",
+  "storagePermissionNeeded": "Storage permission required",
+  "oneKeyScan": "One-Key Scan",
+  "ruleManagement": "Rule Management",
+  "autoClean": "Auto Clean",
+  "largeFiles": "Large Files",
+  "quickActions": "Quick Actions",
+  "enabledRules": "Enabled Rules",
+  "viewAll": "View All",
+  "recentCleanups": "Recent Cleanups",
+  "available": "Available",
+  "used": "Used",
+  "total": "Total",
+  "scanning": "Scanning...",
+  "noEnabledRules": "No enabled rules, please enable a rule first",
+  "noMatchedFiles": "No cleanable files matched",
+  "justNow": "Just now",
+  "minutesAgo": "{count} minutes ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hoursAgo": "{count} hours ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "moreRules": "{count} more rules...",
+  "@moreRules": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "storageInfoError": "Unable to get storage info: {error}",
+  "@storageInfoError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "romDetected": "Detected system: {rom}",
+  "@romDetected": {
+    "placeholders": {
+      "rom": {"type": "String"}
+    }
+  },
+  "settings": "Settings",
+  "thumbnailCache": "Thumbnail Cache",
+  "thumbnailCacheDesc": "Clean image cache in .thumbnails directory",
+  "emptyFolders": "Empty Folders",
+  "emptyFoldersDesc": "Recursively clean empty directories",
+  "downloadTempFiles": "Download Temp Files",
+  "downloadTempFilesDesc": "Clean temporary files in download directory",
+  "logFiles": "Log Files",
+  "logFilesDesc": "Clean application log files",
+  "appResidual": "App Residual",
+  "appResidualDesc": "Clean residual directories of uninstalled apps",
+  "cleanPreview": "Clean Preview",
+  "selectAll": "Select All",
+  "selectNone": "Select None",
+  "selectedCount": "Selected {selected} / {total} files",
+  "@selectedCount": {
+    "placeholders": {
+      "selected": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "releasable": "Releasable {size}",
+  "@releasable": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "noMatchedFilesPreview": "No matched files",
+  "directory": "Directory",
+  "cancel": "Cancel",
+  "cleanWithSize": "Clean ({size})",
+  "@cleanWithSize": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "cleaning": "Cleaning...",
+  "cleanComplete": "Clean Complete",
+  "releasedSpace": "Released space: {size}",
+  "@releasedSpace": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "fileCount": "File count: {count}",
+  "@fileCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "successFailCount": "Success: {success}  Fail: {fail}",
+  "@successFailCount": {
+    "placeholders": {
+      "success": {"type": "int"},
+      "fail": {"type": "int"}
+    }
+  },
+  "duration": "Duration: {duration}",
+  "@duration": {
+    "placeholders": {
+      "duration": {"type": "String"}
+    }
+  },
+  "cleanFailed": "Clean failed: {error}",
+  "@cleanFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "confirm": "OK",
+  "largeFileAnalysis": "Large File Analysis",
+  "minFileSize": "Min file size: {size} MB",
+  "@minFileSize": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "sortBySize": "Sort by size",
+  "sortByTime": "Sort by time",
+  "sortByName": "Sort by name",
+  "noLargeFiles": "No large files found matching criteria",
+  "scanFailed": "Scan failed: {error}",
+  "@scanFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "deleteThisFile": "Delete this file",
+  "deleted": "Deleted",
+  "deleteFailed": "Delete failed",
+  "viewDirectory": "View directory",
+  "ruleListTitle": "Clean Rules",
+  "newRule": "New Rule",
+  "presetRules": "Preset Rules",
+  "customRules": "Custom Rules",
+  "noRules": "No rules yet",
+  "auto": "Auto",
+  "loadFailed": "Load failed: {error}",
+  "@loadFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "priorityLabel": "Priority {priority}",
+  "@priorityLabel": {
+    "placeholders": {
+      "priority": {"type": "int"}
+    }
+  },
+  "normalPermission": "Normal Permission",
+  "editRule": "Edit Rule",
+  "newRuleTitle": "New Rule",
+  "editRuleTitle": "Edit Rule",
+  "save": "Save",
+  "ruleSaved": "Rule saved",
+  "basicInfo": "Basic Info",
+  "ruleName": "Rule Name",
+  "ruleNameHint": "e.g. Clean log files",
+  "nameRequired": "Please enter a name",
+  "description": "Description (optional)",
+  "enableThisRule": "Enable this rule",
+  "priority": "Priority",
+  "priorityDesc": "{priority} (lower number = higher priority)",
+  "@priorityDesc": {
+    "placeholders": {
+      "priority": {"type": "int"}
+    }
+  },
+  "scope": "Scope",
+  "pathLabel": "Path {index}",
+  "@pathLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "pathHint": "/storage/emulated/0/...",
+  "pathRequired": "Please enter a path",
+  "addPath": "Add Path",
+  "recursiveSubdirs": "Recursive subdirectories",
+  "permissionEngine": "Permission Engine",
+  "browseDirectory": "Browse directory",
+  "matchConditions": "Match Conditions",
+  "noConditions": "No conditions added (will match all files)",
+  "addCondition": "Add Condition",
+  "filenameCondition": "Filename",
+  "extensionCondition": "Extension",
+  "fileSizeCondition": "File Size",
+  "modifiedTimeCondition": "Modified Time",
+  "subfileCountCondition": "Subfile Count",
+  "actionType": "Action Type",
+  "deleteAction": "Delete",
+  "shredAction": "Shred Delete",
+  "passesCount": "Overwrite Passes",
+  "passesCountLabel": "{count} passes",
+  "@passesCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "safetyPolicy": "Safety Policy",
+  "requirePreview": "Require preview on first run",
+  "minMatchCount": "Minimum match count",
+  "addExcludedPath": "Add excluded path",
+  "excludedPathLabel": "Excluded path {index}",
+  "@excludedPathLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "conditionLabel": "Condition {index}",
+  "@conditionLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "filenamePattern": "Filename pattern",
+  "filenamePatternHint": "*.log",
+  "matchMode": "Match mode",
+  "wildcardMode": "Wildcard (*, ?)",
+  "regexMode": "Regular Expression",
+  "containsMode": "Contains text",
+  "exactMode": "Exact match",
+  "extensionsLabel": "Extensions (comma separated)",
+  "extensionsHint": "log, tmp, txt",
+  "compareMethod": "Compare method",
+  "greaterThan": "Greater than",
+  "greaterThanOrEqual": "Greater than or equal",
+  "lessThan": "Less than",
+  "lessThanOrEqual": "Less than or equal",
+  "equal": "Equal",
+  "sizeInBytes": "Size (bytes)",
+  "timeFormatHint": "Time (e.g. 7d, 24h, 30m)",
+  "olderThan": "Older than",
+  "newerThan": "Newer than",
+  "subfileCountLabel": "Subfile count",
+  "selectDirectory": "Select Directory",
+  "goUp": "Go up",
+  "thisDirectoryIsEmpty": "This directory is empty",
+  "selectThisDirectory": "Select this directory",
+  "loadDirectoryFailed": "Failed to read directory: {error}",
+  "@loadDirectoryFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "pleaseAddAtLeastOnePath": "Please add at least one path",
+  "settingsTitle": "Settings",
+  "permissionStatus": "Permission",
+  "storagePermission": "Storage Permission",
+  "fullAccessGranted": "Full access granted",
+  "partialAccess": "Partial access only",
+  "notGranted": "Not granted",
+  "unknownStatus": "Unknown",
+  "checkingPermission": "Checking permission...",
+  "batteryOptimization": "Battery Optimization",
+  "avoidBatteryKill": "Avoid being killed by system",
+  "systemInfo": "System Info",
+  "systemType": "System Type",
+  "detecting": "Detecting...",
+  "cannotDetect": "Cannot detect",
+  "version": "Version",
+  "dataSection": "Data",
+  "clearLogs": "Clear Logs",
+  "clearLogsDesc": "Delete all cleanup history records",
+  "confirmClearLogsTitle": "Confirm Clear",
+  "confirmClearLogsMessage": "This action cannot be undone. Are you sure you want to clear all logs?",
+  "logsCleared": "Logs cleared",
+  "cannotCheckPermission": "Cannot check permission",
+  "autoTaskTitle": "Auto Clean",
+  "newAutoTask": "New Auto Task",
+  "editAutoTask": "Edit Auto Task",
+  "newTask": "New Task",
+  "taskName": "Task Name",
+  "taskNameRequired": "Please enter a task name",
+  "selectRules": "Select Rules",
+  "selectRulesRequired": "Please select at least one rule",
+  "executionPeriod": "Execution Period",
+  "executionTime": "Execution Time",
+  "onlyWhenCharging": "Only when charging",
+  "minBatteryLevel": "Minimum battery level",
+  "requirePreviewConfirm": "Require preview confirmation",
+  "previewConfirmDesc": "Notify and wait for confirmation before each execution",
+  "useForegroundService": "Use foreground service",
+  "foregroundServiceDesc": "Improve execution reliability on custom ROMs",
+  "saveTask": "Save Task",
+  "taskSaved": "Auto task saved",
+  "noAutoTasks": "No auto clean tasks configured",
+  "daily": "Daily",
+  "every3Days": "Every 3 days",
+  "weekly": "Weekly",
+  "monthly": "Monthly",
+  "periodLabel": "Period: {period} · {time}",
+  "@periodLabel": {
+    "placeholders": {
+      "period": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "nFiles": "{count} files",
+  "@nFiles": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "executionAction": "Execution Action"
+}
