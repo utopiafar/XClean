@@ -47,12 +47,14 @@ class _DirectoryPickerDialogState extends State<DirectoryPickerDialog> {
     });
 
     try {
-      // Use FileChannel.scanPath instead of dart:io Directory
-      // to leverage MANAGE_EXTERNAL_STORAGE permission through native layer
+      // Directory browsing only needs normal file APIs with
+      // MANAGE_EXTERNAL_STORAGE; avoid 'auto' engine so that Root/Shizuku
+      // (which use `find -type f` and only return files) do not break
+      // the directory listing.
       final results = await FileChannel.scanPath(
         path: _currentPath,
         recursive: false,
-        engine: 'auto',
+        engine: 'normal',
       );
 
       final dirs = results
