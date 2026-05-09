@@ -36,6 +36,8 @@
   "logFilesDesc": "清理应用日志文件",
   "appResidual": "应用残留",
   "appResidualDesc": "清理已卸载应用的残留目录",
+  "apkInstallerFiles": "APK 安装包",
+  "apkInstallerFilesDesc": "清理下载目录中遗留的 APK 安装包",
   "cleanPreview": "清理预览",
   "selectAll": "全选",
   "selectNone": "全不选",

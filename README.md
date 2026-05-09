@@ -22,6 +22,8 @@
 
 ---
 
+> 🇨🇳 [中文 README](README_zh.md)
+
 ## Why XClean?
 
 Most "cleaner" apps on the Play Store are bloated with ads, aggressive upselling, and excessive permissions. **XClean** takes a different approach:
@@ -42,7 +44,7 @@ Most "cleaner" apps on the Play Store are bloated with ads, aggressive upselling
 | 🔍 **One-Key Scan** | Scan with all enabled rules and preview results before cleaning |
 | 📋 **Rule System** | Flexible rules with scope, conditions (filename, extension, size, modified time, subfile count), and actions |
 | 🗑️ **Preview & Select** | Grid preview with thumbnails for images and videos; bulk select/deselect |
-| 📁 **Preset Rules** | Thumbnail cache, empty folders, download temp files, log files, app residual |
+| 📁 **Preset Rules** | Thumbnail cache, empty folders, download temp files, log files, app residual, APK installers |
 | ✏️ **Custom Rules** | Create your own rules with custom paths, conditions, and engines |
 | 🕒 **Auto Clean Tasks** | Schedule periodic cleaning with customizable conditions |
 
@@ -148,34 +150,6 @@ FileChannel.deleteFiles(paths) + log to database
     ↓
 Show completion dialog + refresh dashboard
 ```
-
----
-
-## Roadmap
-
-Based on research of top Android cleaners (CCleaner, SD Maid, Files by Google, Avast Cleanup), here are planned features:
-
-### Short Term
-- [ ] **Duplicate File Finder** – Detect duplicate images/videos/documents regardless of name or location
-- [ ] **Storage Analyzer** – Tree-map / sunburst visualization of storage by directory
-- [ ] **APK Installer Cleanup** – Scan and list leftover APK files in Downloads
-- [ ] **CorpseFinder** – Detect residual files left by uninstalled apps
-- [ ] **Quick Clean Widget** – Home screen 1-tap clean widget
-
-### Medium Term
-- [ ] **Similar Photo Detection** – AI-powered grouping of similar/blurry/duplicate photos
-- [ ] **App Manager** – View apps by size, last used date; batch uninstall; sort by storage hog
-- [ ] **Social App Cleaners** – Dedicated cleaners for WhatsApp, Telegram, WeChat caches
-- [ ] **Database Optimization** – `VACUUM`-style optimization for app databases
-- [ ] **Trash / Recycle Bin** – Move deleted files to a recoverable trash folder for N days
-- [ ] **Dark Theme** – Full Material 3 dynamic theming support
-
-### Long Term
-- [ ] **Cloud Backup Suggestions** – Identify files already backed up to cloud and safe to delete
-- [ ] **Usage-Based Auto Clean** – Auto-clean apps not used in N days (like Files by Google)
-- [ ] **Shizuku Full Integration** – Complete Shizuku engine for system-level cleaning without root
-- [ ] **i18n Expansion** – Japanese, Korean, Spanish, Portuguese
-- [ ] **Wear OS Companion** – Quick clean trigger from smartwatch
 
 ---
 

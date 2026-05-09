@@ -129,6 +129,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appResidualDesc => '清理已卸载应用的残留目录';
 
   @override
+  String get apkInstallerFiles => 'APK 安装包';
+
+  @override
+  String get apkInstallerFilesDesc => '清理下载目录中遗留的 APK 安装包';
+
+  @override
   String get cleanPreview => '清理预览';
 
   @override

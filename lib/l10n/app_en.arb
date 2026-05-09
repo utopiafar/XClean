@@ -66,6 +66,8 @@
   "logFilesDesc": "Clean application log files",
   "appResidual": "App Residual",
   "appResidualDesc": "Clean residual directories of uninstalled apps",
+  "apkInstallerFiles": "APK Installer Files",
+  "apkInstallerFilesDesc": "Clean leftover APK installer packages in download directory",
   "cleanPreview": "Clean Preview",
   "selectAll": "Select All",
   "selectNone": "Select None",

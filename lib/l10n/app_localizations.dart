@@ -314,6 +314,18 @@ abstract class AppLocalizations {
   /// **'Clean residual directories of uninstalled apps'**
   String get appResidualDesc;
 
+  /// No description provided for @apkInstallerFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'APK Installer Files'**
+  String get apkInstallerFiles;
+
+  /// No description provided for @apkInstallerFilesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean leftover APK installer packages in download directory'**
+  String get apkInstallerFilesDesc;
+
   /// No description provided for @cleanPreview.
   ///
   /// In en, this message translates to:

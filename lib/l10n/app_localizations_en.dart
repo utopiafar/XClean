@@ -132,6 +132,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Clean residual directories of uninstalled apps';
 
   @override
+  String get apkInstallerFiles => 'APK Installer Files';
+
+  @override
+  String get apkInstallerFilesDesc =>
+      'Clean leftover APK installer packages in download directory';
+
+  @override
   String get cleanPreview => 'Clean Preview';
 
   @override

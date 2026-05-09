@@ -116,7 +116,25 @@ class RuleRepository {
       ),
     ];
 
-    for (final rule in presets) {
+    final apkRule = CleanRuleEntity(
+      id: 0,
+      name: 'APK Installer Files',
+      description: 'Clean leftover APK installer packages in download directory',
+      enabled: true,
+      priority: 25,
+      scope: const RuleScope(
+        paths: ['/storage/emulated/0/Download'],
+        recursive: true,
+        engine: 'normal',
+      ),
+      matchConditions: const [
+        MatchCondition.extension(values: ['apk']),
+      ],
+      action: const RuleAction(type: 'delete'),
+      safety: const RuleSafety(requirePreview: true),
+    );
+
+    for (final rule in [...presets, apkRule]) {
       await insertRule(rule);
     }
   }
