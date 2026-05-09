@@ -537,6 +537,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataSection => '数据';
 
   @override
+  String get diagnosticLogs => '诊断日志';
+
+  @override
+  String get diagnosticLogsDesc => '查看扫描和删除链路的定位日志';
+
+  @override
+  String get noDiagnosticLogs => '暂无诊断日志';
+
+  @override
+  String get refreshDiagnosticLogs => '刷新诊断日志';
+
+  @override
+  String get clearDiagnosticLogs => '清空诊断日志';
+
+  @override
+  String get diagnosticLogsCleared => '诊断日志已清空';
+
+  @override
   String get viewLogs => '查看日志';
 
   @override

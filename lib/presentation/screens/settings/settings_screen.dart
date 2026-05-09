@@ -15,9 +15,7 @@ class SettingsScreen extends ConsumerWidget {
     final romTypeAsync = ref.watch(romTypeProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
           _buildSectionHeader(context, l10n.permissionStatus),
@@ -32,7 +30,8 @@ class SettingsScreen extends ConsumerWidget {
               trailing: status != 'granted'
                   ? FilledButton(
                       onPressed: () async {
-                        final granted = await PermissionChannel.requestAllFilesAccess();
+                        final granted =
+                            await PermissionChannel.requestAllFilesAccess();
                         if (granted) {
                           ref.invalidate(permissionStatusProvider);
                           ref.invalidate(storageInfoProvider);
@@ -81,9 +80,16 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.version),
-            subtitle: const Text('0.1.0'),
+            subtitle: const Text('0.2.5'),
           ),
           _buildSectionHeader(context, l10n.dataSection),
+          ListTile(
+            leading: const Icon(Icons.bug_report_outlined),
+            title: Text(l10n.diagnosticLogs),
+            subtitle: Text(l10n.diagnosticLogsDesc),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/diagnostic_logs'),
+          ),
           ListTile(
             leading: const Icon(Icons.history),
             title: Text(l10n.viewLogs),
@@ -118,9 +124,9 @@ class SettingsScreen extends ConsumerWidget {
                 await db.delete(db.cleanLogs).go();
                 ref.invalidate(recentLogsProvider);
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.logsCleared)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(l10n.logsCleared)));
                 }
               }
             },

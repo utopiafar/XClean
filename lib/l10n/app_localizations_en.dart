@@ -541,6 +541,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataSection => 'Data';
 
   @override
+  String get diagnosticLogs => 'Diagnostic Logs';
+
+  @override
+  String get diagnosticLogsDesc =>
+      'View scan and deletion troubleshooting logs';
+
+  @override
+  String get noDiagnosticLogs => 'No diagnostic logs yet';
+
+  @override
+  String get refreshDiagnosticLogs => 'Refresh diagnostic logs';
+
+  @override
+  String get clearDiagnosticLogs => 'Clear diagnostic logs';
+
+  @override
+  String get diagnosticLogsCleared => 'Diagnostic logs cleared';
+
+  @override
   String get viewLogs => 'View Logs';
 
   @override

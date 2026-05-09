@@ -1058,6 +1058,42 @@ abstract class AppLocalizations {
   /// **'Data'**
   String get dataSection;
 
+  /// No description provided for @diagnosticLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic Logs'**
+  String get diagnosticLogs;
+
+  /// No description provided for @diagnosticLogsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'View scan and deletion troubleshooting logs'**
+  String get diagnosticLogsDesc;
+
+  /// No description provided for @noDiagnosticLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'No diagnostic logs yet'**
+  String get noDiagnosticLogs;
+
+  /// No description provided for @refreshDiagnosticLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh diagnostic logs'**
+  String get refreshDiagnosticLogs;
+
+  /// No description provided for @clearDiagnosticLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear diagnostic logs'**
+  String get clearDiagnosticLogs;
+
+  /// No description provided for @diagnosticLogsCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic logs cleared'**
+  String get diagnosticLogsCleared;
+
   /// No description provided for @viewLogs.
   ///
   /// In en, this message translates to:

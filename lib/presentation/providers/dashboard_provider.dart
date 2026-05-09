@@ -86,6 +86,7 @@ class ScannedFile {
   final int size;
   final DateTime lastModified;
   final bool isDirectory;
+  final String engine;
   bool selected;
 
   ScannedFile({
@@ -94,6 +95,7 @@ class ScannedFile {
     required this.size,
     required this.lastModified,
     required this.isDirectory,
+    this.engine = 'auto',
     this.selected = true,
   });
 }
@@ -117,26 +119,25 @@ class ScanNotifier extends StateNotifier<ScanState> {
 
           for (final r in results) {
             if (matchesRule(r, rule)) {
-              allFiles.add(ScannedFile(
-                path: r.path,
-                name: r.name,
-                size: r.size,
-                lastModified: DateTime.fromMillisecondsSinceEpoch(r.lastModified),
-                isDirectory: r.isDirectory,
-              ));
+              allFiles.add(
+                ScannedFile(
+                  path: r.path,
+                  name: r.name,
+                  size: r.size,
+                  lastModified: DateTime.fromMillisecondsSinceEpoch(
+                    r.lastModified,
+                  ),
+                  isDirectory: r.isDirectory,
+                  engine: rule.scope.engine,
+                ),
+              );
             }
           }
         }
-        state = state.copyWith(
-          progress: (i + 1) / rules.length,
-        );
+        state = state.copyWith(progress: (i + 1) / rules.length);
       }
 
-      state = ScanState(
-        isScanning: false,
-        progress: 1,
-        files: allFiles,
-      );
+      state = ScanState(isScanning: false, progress: 1, files: allFiles);
     } catch (e) {
       state = ScanState(
         isScanning: false,
@@ -146,20 +147,44 @@ class ScanNotifier extends StateNotifier<ScanState> {
     }
   }
 
-  Future<({CleanResult result, List<String> deletedPaths, List<String> failedPaths})> executeClean() async {
+  Future<
+    ({CleanResult result, List<String> deletedPaths, List<String> failedPaths})
+  >
+  executeClean() async {
     final selectedFiles = state.files.where((f) => f.selected).toList();
     if (selectedFiles.isEmpty) {
-      return (result: const CleanResult(), deletedPaths: <String>[], failedPaths: <String>[]);
+      return (
+        result: const CleanResult(),
+        deletedPaths: <String>[],
+        failedPaths: <String>[],
+      );
     }
 
-    final paths = selectedFiles.map((f) => f.path).toList();
-    final result = await FileChannel.deleteFiles(paths);
+    final resultsByEngine = <String, List<ScannedFile>>{};
+    for (final file in selectedFiles) {
+      resultsByEngine.putIfAbsent(file.engine, () => []).add(file);
+    }
 
-    final freedBytes = result['freedBytes'] as int? ?? 0;
-    final successCount = result['successCount'] as int? ?? 0;
-    final failCount = result['failCount'] as int? ?? 0;
-    final deletedPaths = (result['deletedPaths'] as List<dynamic>?)?.cast<String>() ?? [];
-    final failedPaths = (result['failedPaths'] as List<dynamic>?)?.cast<String>() ?? [];
+    var freedBytes = 0;
+    var successCount = 0;
+    var failCount = 0;
+    final deletedPaths = <String>[];
+    final failedPaths = <String>[];
+
+    for (final entry in resultsByEngine.entries) {
+      final paths = entry.value.map((f) => f.path).toList();
+      final result = await FileChannel.deleteFiles(paths, engine: entry.key);
+
+      freedBytes += result['freedBytes'] as int? ?? 0;
+      successCount += result['successCount'] as int? ?? 0;
+      failCount += result['failCount'] as int? ?? 0;
+      deletedPaths.addAll(
+        (result['deletedPaths'] as List<dynamic>?)?.cast<String>() ?? [],
+      );
+      failedPaths.addAll(
+        (result['failedPaths'] as List<dynamic>?)?.cast<String>() ?? [],
+      );
+    }
 
     return (
       result: CleanResult(
@@ -180,22 +205,25 @@ class ScanNotifier extends StateNotifier<ScanState> {
   }
 
   void selectAll(bool selected) {
-    final files = state.files.map((f) => ScannedFile(
-      path: f.path,
-      name: f.name,
-      size: f.size,
-      lastModified: f.lastModified,
-      isDirectory: f.isDirectory,
-      selected: selected,
-    )).toList();
+    final files = state.files
+        .map(
+          (f) => ScannedFile(
+            path: f.path,
+            name: f.name,
+            size: f.size,
+            lastModified: f.lastModified,
+            isDirectory: f.isDirectory,
+            engine: f.engine,
+            selected: selected,
+          ),
+        )
+        .toList();
     state = state.copyWith(files: files);
   }
 
   void clear() {
     state = const ScanState();
   }
-
-
 }
 
 final scanProvider = StateNotifierProvider<ScanNotifier, ScanState>((ref) {

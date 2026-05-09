@@ -4,6 +4,7 @@ import '../presentation/screens/clean/preview_screen.dart';
 import '../presentation/screens/rules/rule_editor_screen.dart';
 import '../presentation/screens/rules/rule_list_screen.dart';
 import '../presentation/screens/analyze/large_file_screen.dart';
+import '../presentation/screens/logs/diagnostic_log_screen.dart';
 import '../presentation/screens/logs/log_list_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
 import '../presentation/screens/tasks/auto_task_screen.dart';
@@ -11,10 +12,7 @@ import '../presentation/screens/tasks/auto_task_screen.dart';
 final router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const DashboardScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const DashboardScreen()),
     GoRoute(
       path: '/preview',
       builder: (context, state) => const PreviewScreen(),
@@ -34,9 +32,10 @@ final router = GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
     ),
+    GoRoute(path: '/logs', builder: (context, state) => const LogListScreen()),
     GoRoute(
-      path: '/logs',
-      builder: (context, state) => const LogListScreen(),
+      path: '/diagnostic_logs',
+      builder: (context, state) => const DiagnosticLogScreen(),
     ),
     GoRoute(
       path: '/auto_tasks',

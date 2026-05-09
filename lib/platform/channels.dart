@@ -57,7 +57,9 @@ class FileChannel {
       'recursive': recursive,
       'engine': engine,
     });
-    return (result ?? []).map((e) => NativeScanResult.fromMap(Map<String, dynamic>.from(e))).toList();
+    return (result ?? [])
+        .map((e) => NativeScanResult.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
   }
 
   /// Stream scan for large directories
@@ -79,31 +81,53 @@ class FileChannel {
   }
 
   /// Delete files by paths
-  static Future<Map<String, dynamic>> deleteFiles(List<String> paths, {String engine = 'auto'}) async {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('deleteFiles', {
-      'paths': paths,
-      'engine': engine,
-    });
+  static Future<Map<String, dynamic>> deleteFiles(
+    List<String> paths, {
+    String engine = 'auto',
+    bool requireExisting = true,
+  }) async {
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+      'deleteFiles',
+      {'paths': paths, 'engine': engine, 'requireExisting': requireExisting},
+    );
     return Map<String, dynamic>.from(result ?? {});
+  }
+
+  /// Read native diagnostic logs for scan/delete troubleshooting.
+  static Future<String> getDiagnosticLogs() async {
+    return await _channel.invokeMethod<String>('getDiagnosticLogs') ?? '';
+  }
+
+  /// Clear native diagnostic logs.
+  static Future<bool> clearDiagnosticLogs() async {
+    return await _channel.invokeMethod<bool>('clearDiagnosticLogs') ?? false;
   }
 
   /// Get storage info: {totalBytes, freeBytes, usedBytes}
   static Future<Map<String, dynamic>> getStorageInfo() async {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getStorageInfo');
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+      'getStorageInfo',
+    );
     return Map<String, dynamic>.from(result ?? {});
   }
 
   /// Calculate directory size
-  static Future<int> getDirectorySize(String path, {String engine = 'auto'}) async {
+  static Future<int> getDirectorySize(
+    String path, {
+    String engine = 'auto',
+  }) async {
     return await _channel.invokeMethod<int>('getDirectorySize', {
-      'path': path,
-      'engine': engine,
-    }) ?? 0;
+          'path': path,
+          'engine': engine,
+        }) ??
+        0;
   }
 
   /// Get video thumbnail path (JPEG). Returns null if thumbnail cannot be generated.
   static Future<String?> getVideoThumbnail(String path) async {
-    return await _channel.invokeMethod<String>('getVideoThumbnail', {'path': path});
+    return await _channel.invokeMethod<String>('getVideoThumbnail', {
+      'path': path,
+    });
   }
 }
 
@@ -112,7 +136,8 @@ class PermissionChannel {
   static const _channel = MethodChannel(ChannelNames.permissionChannel);
 
   static Future<String> getPermissionStatus() async {
-    return await _channel.invokeMethod<String>('getPermissionStatus') ?? 'unknown';
+    return await _channel.invokeMethod<String>('getPermissionStatus') ??
+        'unknown';
   }
 
   static Future<bool> requestAllFilesAccess() async {
@@ -128,11 +153,15 @@ class PermissionChannel {
   }
 
   static Future<bool> isBatteryOptimizationIgnored() async {
-    return await _channel.invokeMethod<bool>('isBatteryOptimizationIgnored') ?? false;
+    return await _channel.invokeMethod<bool>('isBatteryOptimizationIgnored') ??
+        false;
   }
 
   static Future<bool> requestIgnoreBatteryOptimization() async {
-    return await _channel.invokeMethod<bool>('requestIgnoreBatteryOptimization') ?? false;
+    return await _channel.invokeMethod<bool>(
+          'requestIgnoreBatteryOptimization',
+        ) ??
+        false;
   }
 
   static Future<bool> isShizukuAvailable() async {
@@ -154,10 +183,11 @@ class BackgroundChannel {
     bool useForegroundService = false,
   }) async {
     return await _channel.invokeMethod<bool>('scheduleAutoClean', {
-      'intervalMinutes': intervalMinutes,
-      'ruleIds': ruleIds,
-      'useForegroundService': useForegroundService,
-    }) ?? false;
+          'intervalMinutes': intervalMinutes,
+          'ruleIds': ruleIds,
+          'useForegroundService': useForegroundService,
+        }) ??
+        false;
   }
 
   static Future<bool> cancelAutoClean() async {

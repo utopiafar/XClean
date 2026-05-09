@@ -1,9 +1,15 @@
 package com.utopiafar.xclean.channels
 
+import android.content.ContentUris
+import android.content.Context
+import android.media.MediaScannerConnection
+import android.provider.BaseColumns
+import android.provider.MediaStore
 import android.os.Environment
 import android.os.StatFs
 import com.utopiafar.xclean.engine.RootFileEngine
 import com.utopiafar.xclean.engine.ShizukuFileEngine
+import com.utopiafar.xclean.utils.DiagnosticLog
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -22,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Supported engines: "normal" (standard java.io.File API).
  */
 class FileChannel(
+    private val context: Context,
     flutterEngine: FlutterEngine
 ) : MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
@@ -59,6 +66,33 @@ class FileChannel(
         val engine: String
     )
 
+    private data class TargetState(
+        val exists: Boolean,
+        val isFile: Boolean,
+        val isDirectory: Boolean,
+        val canRead: Boolean,
+        val canWrite: Boolean,
+        val length: Long,
+        val lastModified: Long,
+        val parentExists: Boolean,
+        val parentCanRead: Boolean,
+        val parentCanWrite: Boolean,
+        val parentContains: Boolean?
+    ) {
+        val confirmedPresent: Boolean
+            get() = exists || parentContains == true
+
+        val confirmedAbsent: Boolean
+            get() = !exists && parentContains == false
+
+        fun toLogString(): String {
+            return "exists=$exists isFile=$isFile isDir=$isDirectory canRead=$canRead " +
+                    "canWrite=$canWrite length=$length lastModified=$lastModified " +
+                    "parentExists=$parentExists parentCanRead=$parentCanRead " +
+                    "parentCanWrite=$parentCanWrite parentContains=$parentContains"
+        }
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "scanPath" -> {
@@ -70,9 +104,14 @@ class FileChannel(
 
                 scope.launch(Dispatchers.IO) {
                     try {
+                        DiagnosticLog.write(
+                            "scan.request",
+                            "path=$path recursive=$recursive engine=$engine pattern=${pattern ?: ""}"
+                        )
                         val files = scanPathInternal(path, pattern, recursive, engine)
                         withContext(Dispatchers.Main) { result.success(files) }
                     } catch (e: Exception) {
+                        DiagnosticLog.write("scan.error", "path=$path engine=$engine", e)
                         withContext(Dispatchers.Main) {
                             result.error("SCAN_ERROR", e.message, null)
                         }
@@ -95,17 +134,30 @@ class FileChannel(
                 val paths = call.argument<List<String>>("paths")
                     ?: return result.error("INVALID_ARG", "paths is required", null)
                 val engine = call.argument<String>("engine") ?: "auto"
+                val requireExisting = call.argument<Boolean>("requireExisting") ?: true
 
                 scope.launch(Dispatchers.IO) {
                     try {
-                        val deleteResult = deleteFilesInternal(paths, engine)
+                        DiagnosticLog.write(
+                            "delete.request",
+                            "count=${paths.size} engine=$engine requireExisting=$requireExisting"
+                        )
+                        val deleteResult = deleteFilesInternal(paths, engine, requireExisting)
                         withContext(Dispatchers.Main) { result.success(deleteResult) }
                     } catch (e: Exception) {
+                        DiagnosticLog.write("delete.error", "count=${paths.size} engine=$engine", e)
                         withContext(Dispatchers.Main) {
                             result.error("DELETE_ERROR", e.message, null)
                         }
                     }
                 }
+            }
+
+            "getDiagnosticLogs" -> result.success(DiagnosticLog.read())
+
+            "clearDiagnosticLogs" -> {
+                DiagnosticLog.clear()
+                result.success(true)
             }
 
             "getStorageInfo" -> {
@@ -204,13 +256,20 @@ class FileChannel(
         recursive: Boolean,
         engine: String
     ): List<Map<String, Any>> {
-        return when (resolveEngine(engine)) {
+        val resolvedEngine = resolveEngine(engine)
+        val results = when (resolvedEngine) {
             ENGINE_ROOT -> RootFileEngine.listFiles(path, recursive, pattern)
             ENGINE_SHIZUKU -> ShizukuFileEngine.listFiles(path, recursive, pattern)
             else -> {
                 val results = mutableListOf<Map<String, Any>>()
                 val root = File(path)
-                if (!root.exists()) return results
+                if (!root.exists()) {
+                    DiagnosticLog.write(
+                        "scan.path_missing",
+                        "path=$path requestedEngine=$engine resolvedEngine=$resolvedEngine"
+                    )
+                    return results
+                }
 
                 val matcher = pattern?.let { createPatternMatcher(it) }
                 val files = if (recursive) {
@@ -228,6 +287,11 @@ class FileChannel(
                 results
             }
         }
+        DiagnosticLog.write(
+            "scan.result",
+            "path=$path requestedEngine=$engine resolvedEngine=$resolvedEngine count=${results.size}"
+        )
+        return results
     }
 
     private suspend fun scanPathStreamInternal(
@@ -258,51 +322,105 @@ class FileChannel(
         }
     }
 
-    private fun deleteFilesInternal(paths: List<String>, engine: String): Map<String, Any> {
-        return when (resolveEngine(engine)) {
+    private fun deleteFilesInternal(paths: List<String>, engine: String, requireExisting: Boolean): Map<String, Any> {
+        val resolvedEngine = resolveEngine(engine)
+        DiagnosticLog.write(
+            "delete.engine",
+            "requestedEngine=$engine resolvedEngine=$resolvedEngine count=${paths.size}"
+        )
+        return when (resolvedEngine) {
             ENGINE_ROOT -> RootFileEngine.deleteFiles(paths)
             ENGINE_SHIZUKU -> ShizukuFileEngine.deleteFiles(paths)
-            else -> {
-                val deletedPaths = mutableListOf<String>()
-                val failedPaths = mutableListOf<String>()
-                var successCount = 0
-                var failCount = 0
-                var freedBytes = 0L
+            else -> deleteFilesWithNormalEngine(paths, requireExisting)
+        }
+    }
 
-                paths.forEach { path ->
-                    val file = File(path)
-                    val size = when {
-                        file.isFile -> file.length()
-                        file.isDirectory -> getDirectorySizeInternal(path, engine)
-                        else -> 0L
-                    }
+    private fun deleteFilesWithNormalEngine(paths: List<String>, requireExisting: Boolean): Map<String, Any> {
+        val deletedPaths = mutableListOf<String>()
+        val failedPaths = mutableListOf<String>()
+        var successCount = 0
+        var failCount = 0
+        var freedBytes = 0L
 
-                    // Attempt deletion
-                    file.deleteRecursively()
+        paths.forEach { path ->
+            val file = File(path)
+            val beforeState = inspectTarget(file)
+            val size = when {
+                beforeState.isFile -> beforeState.length
+                beforeState.isDirectory -> getDirectorySizeInternal(path, ENGINE_NORMAL)
+                else -> 0L
+            }
 
-                    // CRITICAL FIX: Kotlin's deleteRecursively() returns true for
-                    // non-existent paths. Verify by checking actual existence.
-                    val stillExists = file.exists()
+            DiagnosticLog.write(
+                "delete.normal.before",
+                "path=$path requireExisting=$requireExisting size=$size ${beforeState.toLogString()}"
+            )
 
-                    if (!stillExists) {
-                        successCount++
-                        freedBytes += size
-                        deletedPaths.add(path)
-                    } else {
-                        failCount++
-                        failedPaths.add(path)
-                    }
+            var deleteReturned = false
+            var deleteError: String? = null
+            try {
+                deleteReturned = file.deleteRecursively()
+            } catch (e: Exception) {
+                deleteError = "${e::class.java.simpleName}: ${e.message}"
+                DiagnosticLog.write("delete.normal.direct_error", "path=$path", e)
+            }
+
+            var afterState = inspectTarget(file)
+            DiagnosticLog.write(
+                "delete.normal.after_direct",
+                "path=$path deleteReturned=$deleteReturned deleteError=${deleteError ?: ""} ${afterState.toLogString()}"
+            )
+
+            var mediaStoreRows = 0
+            if (!afterState.confirmedAbsent) {
+                mediaStoreRows = deleteViaMediaStore(path)
+                if (mediaStoreRows > 0) {
+                    notifyMediaScanner(path)
+                    afterState = inspectTarget(file)
                 }
+                DiagnosticLog.write(
+                    "delete.normal.after_mediastore",
+                    "path=$path rows=$mediaStoreRows ${afterState.toLogString()}"
+                )
+            } else {
+                notifyMediaScanner(path)
+            }
 
-                mapOf(
-                    "successCount" to successCount,
-                    "failCount" to failCount,
-                    "freedBytes" to freedBytes,
-                    "deletedPaths" to deletedPaths,
-                    "failedPaths" to failedPaths
+            val wasKnownMissing = !beforeState.confirmedPresent && beforeState.confirmedAbsent
+            val success = afterState.confirmedAbsent && (!requireExisting || beforeState.confirmedPresent || wasKnownMissing)
+
+            if (success) {
+                successCount++
+                freedBytes += size
+                deletedPaths.add(path)
+                DiagnosticLog.write(
+                    "delete.normal.success",
+                    "path=$path size=$size directReturned=$deleteReturned mediaStoreRows=$mediaStoreRows"
+                )
+            } else {
+                failCount++
+                failedPaths.add(path)
+                DiagnosticLog.write(
+                    "delete.normal.fail",
+                    "path=$path directReturned=$deleteReturned mediaStoreRows=$mediaStoreRows " +
+                            "beforeConfirmedPresent=${beforeState.confirmedPresent} " +
+                            "afterConfirmedAbsent=${afterState.confirmedAbsent}"
                 )
             }
         }
+
+        DiagnosticLog.write(
+            "delete.summary",
+            "engine=$ENGINE_NORMAL success=$successCount fail=$failCount freedBytes=$freedBytes"
+        )
+
+        return mapOf(
+            "successCount" to successCount,
+            "failCount" to failCount,
+            "freedBytes" to freedBytes,
+            "deletedPaths" to deletedPaths,
+            "failedPaths" to failedPaths
+        )
     }
 
     @Suppress("DEPRECATION")
@@ -333,6 +451,89 @@ class FileChannel(
                     .filter { it.isFile }
                     .sumOf { it.length() }
             }
+        }
+    }
+
+    private fun inspectTarget(file: File): TargetState {
+        val parent = file.parentFile
+        val parentNames = try {
+            parent?.list()
+        } catch (e: Exception) {
+            DiagnosticLog.write("file.inspect_parent_error", "path=${file.absolutePath}", e)
+            null
+        }
+        val parentContains = parentNames?.contains(file.name)
+
+        return TargetState(
+            exists = safeBoolean("exists", file) { file.exists() },
+            isFile = safeBoolean("isFile", file) { file.isFile },
+            isDirectory = safeBoolean("isDirectory", file) { file.isDirectory },
+            canRead = safeBoolean("canRead", file) { file.canRead() },
+            canWrite = safeBoolean("canWrite", file) { file.canWrite() },
+            length = try {
+                file.length()
+            } catch (_: Exception) {
+                0L
+            },
+            lastModified = try {
+                file.lastModified()
+            } catch (_: Exception) {
+                0L
+            },
+            parentExists = parent?.let { safeBoolean("parent.exists", it) { it.exists() } } ?: false,
+            parentCanRead = parent?.let { safeBoolean("parent.canRead", it) { it.canRead() } } ?: false,
+            parentCanWrite = parent?.let { safeBoolean("parent.canWrite", it) { it.canWrite() } } ?: false,
+            parentContains = parentContains
+        )
+    }
+
+    private fun safeBoolean(label: String, file: File, block: () -> Boolean): Boolean {
+        return try {
+            block()
+        } catch (e: Exception) {
+            DiagnosticLog.write("file.$label.error", "path=${file.absolutePath}", e)
+            false
+        }
+    }
+
+    private fun deleteViaMediaStore(path: String): Int {
+        return try {
+            val resolver = context.contentResolver
+            val collection = MediaStore.Files.getContentUri("external")
+            val ids = mutableListOf<Long>()
+            resolver.query(
+                collection,
+                arrayOf(BaseColumns._ID),
+                "${MediaStore.MediaColumns.DATA}=?",
+                arrayOf(path),
+                null
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(BaseColumns._ID)
+                while (cursor.moveToNext()) {
+                    ids.add(cursor.getLong(idColumn))
+                }
+            }
+
+            var deletedRows = 0
+            ids.forEach { id ->
+                val uri = ContentUris.withAppendedId(collection, id)
+                deletedRows += resolver.delete(uri, null, null)
+            }
+            DiagnosticLog.write("delete.mediastore", "path=$path ids=${ids.size} deletedRows=$deletedRows")
+            deletedRows
+        } catch (e: Exception) {
+            DiagnosticLog.write("delete.mediastore_error", "path=$path", e)
+            0
+        }
+    }
+
+    private fun notifyMediaScanner(path: String) {
+        try {
+            MediaScannerConnection.scanFile(context, arrayOf(path), null) { scannedPath, uri ->
+                DiagnosticLog.write("media.scan", "path=$scannedPath uri=${uri ?: ""}")
+            }
+        } catch (e: Exception) {
+            DiagnosticLog.write("media.scan_error", "path=$path", e)
         }
     }
 

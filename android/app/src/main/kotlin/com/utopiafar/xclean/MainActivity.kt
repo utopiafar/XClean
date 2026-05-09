@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.utopiafar.xclean.channels.BackgroundChannel
 import com.utopiafar.xclean.channels.FileChannel
 import com.utopiafar.xclean.channels.PermissionChannel
+import com.utopiafar.xclean.utils.DiagnosticLog
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 
@@ -23,7 +24,8 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        fileChannel = FileChannel(flutterEngine)
+        DiagnosticLog.init(applicationContext)
+        fileChannel = FileChannel(applicationContext, flutterEngine)
         permissionChannel = PermissionChannel(this, flutterEngine)
         backgroundChannel = BackgroundChannel(this, flutterEngine)
     }
