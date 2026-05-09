@@ -49,6 +49,8 @@
   "cleanWithSize": "清理 ({size})",
   "cleaning": "正在清理...",
   "cleanComplete": "清理完成",
+  "cleanFailedTitle": "清理失败",
+  "cleanPartialSuccess": "部分清理成功",
   "releasedSpace": "释放空间: {size}",
   "fileCount": "文件数量: {count}",
   "successFailCount": "成功: {success}  失败: {fail}",
@@ -158,6 +160,8 @@
   "cannotDetect": "无法检测",
   "version": "版本",
   "dataSection": "数据",
+  "viewLogs": "查看日志",
+  "viewLogsDesc": "浏览所有清理历史记录",
   "clearLogs": "清空日志",
   "clearLogsDesc": "删除所有清理历史记录",
   "confirmClearLogsTitle": "确认清空",
@@ -194,5 +198,6 @@
   "deleteRuleMessage": "确定要删除规则 \"{name}\" 吗？",
   "ruleDeleted": "规则已删除",
   "deletedFilesTitle": "已删除文件 ({count})",
+  "noLogs": "暂无清理记录",
   "noDeletedFilesDetail": "没有可用的文件详情"
 }

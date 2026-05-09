@@ -153,16 +153,14 @@ class PreviewScreen extends ConsumerWidget {
     );
 
     try {
-      final result = await notifier.executeClean();
+      final cleanData = await notifier.executeClean();
+      final result = cleanData.result;
+      final deletedPaths = cleanData.deletedPaths;
       final duration = DateTime.now().difference(startTime).inMilliseconds;
       final finalResult = result.copyWith(durationMs: duration);
 
-      // Record deleted file names in log details
-      final currentState = ref.read(scanProvider);
-      final deletedFiles = currentState.files
-          .where((f) => f.selected)
-          .map((f) => f.name)
-          .toList();
+      // Record actually deleted file names in log details
+      final deletedFiles = deletedPaths.map((p) => p.split('/').last).toList();
 
       await ref.read(logRepositoryProvider).insertLog(CleanLogEntity(
         id: 0,
@@ -179,10 +177,20 @@ class PreviewScreen extends ConsumerWidget {
         ref.invalidate(recentLogsProvider);
         ref.invalidate(storageInfoProvider);
 
+        // Dynamic dialog title based on actual results
+        final String dialogTitle;
+        if (finalResult.failCount == 0 && finalResult.successCount > 0) {
+          dialogTitle = l10n.cleanComplete;
+        } else if (finalResult.successCount == 0) {
+          dialogTitle = l10n.cleanFailedTitle;
+        } else {
+          dialogTitle = l10n.cleanPartialSuccess;
+        }
+
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text(l10n.cleanComplete),
+            title: Text(dialogTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,

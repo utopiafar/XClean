@@ -13,6 +13,11 @@ class LogRepository {
     return rows.map(_mapRowToEntity).toList();
   }
 
+  Future<List<CleanLogEntity>> getAllLogs() async {
+    final rows = await _db.getAllLogs();
+    return rows.map(_mapRowToEntity).toList();
+  }
+
   Future<int> insertLog(CleanLogEntity log) {
     return _db.insertLog(CleanLogsCompanion(
       executedAt: Value(log.executedAt),

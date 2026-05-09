@@ -4,6 +4,7 @@ import '../presentation/screens/clean/preview_screen.dart';
 import '../presentation/screens/rules/rule_editor_screen.dart';
 import '../presentation/screens/rules/rule_list_screen.dart';
 import '../presentation/screens/analyze/large_file_screen.dart';
+import '../presentation/screens/logs/log_list_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
 import '../presentation/screens/tasks/auto_task_screen.dart';
 
@@ -32,6 +33,10 @@ final router = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/logs',
+      builder: (context, state) => const LogListScreen(),
     ),
     GoRoute(
       path: '/auto_tasks',

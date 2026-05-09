@@ -174,6 +174,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cleanComplete => '清理完成';
 
   @override
+  String get cleanFailedTitle => '清理失败';
+
+  @override
+  String get cleanPartialSuccess => '部分清理成功';
+
+  @override
   String releasedSpace(String size) {
     return '释放空间: $size';
   }
@@ -531,6 +537,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataSection => '数据';
 
   @override
+  String get viewLogs => '查看日志';
+
+  @override
+  String get viewLogsDesc => '浏览所有清理历史记录';
+
+  @override
   String get clearLogs => '清空日志';
 
   @override
@@ -645,6 +657,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String deletedFilesTitle(int count) {
     return '已删除文件 ($count)';
   }
+
+  @override
+  String get noLogs => '暂无清理记录';
 
   @override
   String get noDeletedFilesDetail => '没有可用的文件详情';

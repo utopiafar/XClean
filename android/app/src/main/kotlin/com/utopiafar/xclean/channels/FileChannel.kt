@@ -263,6 +263,8 @@ class FileChannel(
             ENGINE_ROOT -> RootFileEngine.deleteFiles(paths)
             ENGINE_SHIZUKU -> ShizukuFileEngine.deleteFiles(paths)
             else -> {
+                val deletedPaths = mutableListOf<String>()
+                val failedPaths = mutableListOf<String>()
                 var successCount = 0
                 var failCount = 0
                 var freedBytes = 0L
@@ -275,19 +277,29 @@ class FileChannel(
                         else -> 0L
                     }
 
-                    val deleted = file.deleteRecursively()
-                    if (deleted) {
+                    // Attempt deletion
+                    file.deleteRecursively()
+
+                    // CRITICAL FIX: Kotlin's deleteRecursively() returns true for
+                    // non-existent paths. Verify by checking actual existence.
+                    val stillExists = file.exists()
+
+                    if (!stillExists) {
                         successCount++
                         freedBytes += size
+                        deletedPaths.add(path)
                     } else {
                         failCount++
+                        failedPaths.add(path)
                     }
                 }
 
                 mapOf(
                     "successCount" to successCount,
                     "failCount" to failCount,
-                    "freedBytes" to freedBytes
+                    "freedBytes" to freedBytes,
+                    "deletedPaths" to deletedPaths,
+                    "failedPaths" to failedPaths
                 )
             }
         }

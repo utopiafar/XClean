@@ -95,6 +95,8 @@
   },
   "cleaning": "Cleaning...",
   "cleanComplete": "Clean Complete",
+  "cleanFailedTitle": "Clean Failed",
+  "cleanPartialSuccess": "Partially Cleaned",
   "releasedSpace": "Released space: {size}",
   "@releasedSpace": {
     "placeholders": {
@@ -280,6 +282,8 @@
   "cannotDetect": "Cannot detect",
   "version": "Version",
   "dataSection": "Data",
+  "viewLogs": "View Logs",
+  "viewLogsDesc": "Browse all cleanup history",
   "clearLogs": "Clear Logs",
   "clearLogsDesc": "Delete all cleanup history records",
   "confirmClearLogsTitle": "Confirm Clear",
@@ -337,5 +341,6 @@
       "count": {"type": "int"}
     }
   },
+  "noLogs": "No cleanup history yet",
   "noDeletedFilesDetail": "No file details available"
 }

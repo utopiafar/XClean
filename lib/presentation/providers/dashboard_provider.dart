@@ -38,6 +38,11 @@ final recentLogsProvider = FutureProvider<List<CleanLogEntity>>((ref) async {
   return repo.getRecentLogs(10);
 });
 
+final allLogsProvider = FutureProvider<List<CleanLogEntity>>((ref) async {
+  final repo = ref.watch(logRepositoryProvider);
+  return repo.getAllLogs();
+});
+
 final permissionStatusProvider = FutureProvider<String>((ref) async {
   return PermissionChannel.getPermissionStatus();
 });
@@ -141,10 +146,10 @@ class ScanNotifier extends StateNotifier<ScanState> {
     }
   }
 
-  Future<CleanResult> executeClean() async {
+  Future<({CleanResult result, List<String> deletedPaths, List<String> failedPaths})> executeClean() async {
     final selectedFiles = state.files.where((f) => f.selected).toList();
     if (selectedFiles.isEmpty) {
-      return const CleanResult();
+      return (result: const CleanResult(), deletedPaths: <String>[], failedPaths: <String>[]);
     }
 
     final paths = selectedFiles.map((f) => f.path).toList();
@@ -153,12 +158,18 @@ class ScanNotifier extends StateNotifier<ScanState> {
     final freedBytes = result['freedBytes'] as int? ?? 0;
     final successCount = result['successCount'] as int? ?? 0;
     final failCount = result['failCount'] as int? ?? 0;
+    final deletedPaths = (result['deletedPaths'] as List<dynamic>?)?.cast<String>() ?? [];
+    final failedPaths = (result['failedPaths'] as List<dynamic>?)?.cast<String>() ?? [];
 
-    return CleanResult(
-      freedBytes: freedBytes,
-      fileCount: selectedFiles.length,
-      successCount: successCount,
-      failCount: failCount,
+    return (
+      result: CleanResult(
+        freedBytes: freedBytes,
+        fileCount: selectedFiles.length,
+        successCount: successCount,
+        failCount: failCount,
+      ),
+      deletedPaths: deletedPaths,
+      failedPaths: failedPaths,
     );
   }
 

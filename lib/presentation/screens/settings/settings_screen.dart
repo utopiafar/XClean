@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xclean/l10n/app_localizations.dart';
 import '../../../platform/channels.dart';
 import '../../providers/dashboard_provider.dart';
@@ -83,6 +84,13 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('0.1.0'),
           ),
           _buildSectionHeader(context, l10n.dataSection),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(l10n.viewLogs),
+            subtitle: Text(l10n.viewLogsDesc),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/logs'),
+          ),
           ListTile(
             leading: const Icon(Icons.delete_forever),
             title: Text(l10n.clearLogs),

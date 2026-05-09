@@ -105,6 +105,12 @@ class AppDatabase extends _$AppDatabase {
         .get();
   }
 
+  Future<List<CleanLog>> getAllLogs() async {
+    return (select(cleanLogs)
+          ..orderBy([(l) => OrderingTerm.desc(l.executedAt)]))
+        .get();
+  }
+
   Future<int> insertLog(CleanLogsCompanion log) => into(cleanLogs).insert(log);
 
   Future<int> clearOldLogs(DateTime before) =>

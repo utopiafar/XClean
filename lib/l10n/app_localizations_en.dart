@@ -178,6 +178,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cleanComplete => 'Clean Complete';
 
   @override
+  String get cleanFailedTitle => 'Clean Failed';
+
+  @override
+  String get cleanPartialSuccess => 'Partially Cleaned';
+
+  @override
   String releasedSpace(String size) {
     return 'Released space: $size';
   }
@@ -535,6 +541,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataSection => 'Data';
 
   @override
+  String get viewLogs => 'View Logs';
+
+  @override
+  String get viewLogsDesc => 'Browse all cleanup history';
+
+  @override
   String get clearLogs => 'Clear Logs';
 
   @override
@@ -652,6 +664,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String deletedFilesTitle(int count) {
     return 'Deleted Files ($count)';
   }
+
+  @override
+  String get noLogs => 'No cleanup history yet';
 
   @override
   String get noDeletedFilesDetail => 'No file details available';

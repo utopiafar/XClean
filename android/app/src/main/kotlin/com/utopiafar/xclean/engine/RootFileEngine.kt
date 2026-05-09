@@ -50,6 +50,8 @@ object RootFileEngine {
         var successCount = 0
         var failCount = 0
         var freedBytes = 0L
+        val deletedPaths = mutableListOf<String>()
+        val failedPaths = mutableListOf<String>()
 
         paths.forEach { path ->
             val sizeStr = exec("su -c 'du -sb \"$path\"'")
@@ -59,15 +61,19 @@ object RootFileEngine {
             if (!exists) {
                 successCount++
                 freedBytes += size
+                deletedPaths.add(path)
             } else {
                 failCount++
+                failedPaths.add(path)
             }
         }
 
         return mapOf(
             "successCount" to successCount,
             "failCount" to failCount,
-            "freedBytes" to freedBytes
+            "freedBytes" to freedBytes,
+            "deletedPaths" to deletedPaths,
+            "failedPaths" to failedPaths
         )
     }
 

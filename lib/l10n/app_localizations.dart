@@ -392,6 +392,18 @@ abstract class AppLocalizations {
   /// **'Clean Complete'**
   String get cleanComplete;
 
+  /// No description provided for @cleanFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean Failed'**
+  String get cleanFailedTitle;
+
+  /// No description provided for @cleanPartialSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially Cleaned'**
+  String get cleanPartialSuccess;
+
   /// No description provided for @releasedSpace.
   ///
   /// In en, this message translates to:
@@ -1046,6 +1058,18 @@ abstract class AppLocalizations {
   /// **'Data'**
   String get dataSection;
 
+  /// No description provided for @viewLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'View Logs'**
+  String get viewLogs;
+
+  /// No description provided for @viewLogsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse all cleanup history'**
+  String get viewLogsDesc;
+
   /// No description provided for @clearLogs.
   ///
   /// In en, this message translates to:
@@ -1261,6 +1285,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleted Files ({count})'**
   String deletedFilesTitle(int count);
+
+  /// No description provided for @noLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'No cleanup history yet'**
+  String get noLogs;
 
   /// No description provided for @noDeletedFilesDetail.
   ///
