@@ -216,6 +216,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noLargeFiles => '没有找到符合条件的大文件';
 
   @override
+  String get videoThumbnailError => '视频缩略图不可用';
+
+  @override
   String scanFailed(String error) {
     return '扫描失败: $error';
   }
@@ -620,4 +623,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get executionAction => '执行动作';
+
+  @override
+  String get deleteRuleTitle => '删除规则';
+
+  @override
+  String deleteRuleMessage(String name) {
+    return '确定要删除规则 \"$name\" 吗？';
+  }
+
+  @override
+  String get ruleDeleted => '规则已删除';
+
+  @override
+  String deletedFilesTitle(int count) {
+    return '已删除文件 ($count)';
+  }
+
+  @override
+  String get noDeletedFilesDetail => '没有可用的文件详情';
 }

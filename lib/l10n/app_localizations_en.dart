@@ -219,6 +219,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noLargeFiles => 'No large files found matching criteria';
 
   @override
+  String get videoThumbnailError => 'Video thumbnail unavailable';
+
+  @override
   String scanFailed(String error) {
     return 'Scan failed: $error';
   }
@@ -626,4 +629,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get executionAction => 'Execution Action';
+
+  @override
+  String get deleteRuleTitle => 'Delete Rule';
+
+  @override
+  String deleteRuleMessage(String name) {
+    return 'Are you sure you want to delete the rule \"$name\"?';
+  }
+
+  @override
+  String get ruleDeleted => 'Rule deleted';
+
+  @override
+  String deletedFilesTitle(int count) {
+    return 'Deleted Files ($count)';
+  }
+
+  @override
+  String get noDeletedFilesDetail => 'No file details available';
 }

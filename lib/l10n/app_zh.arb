@@ -59,6 +59,7 @@
   "sortByTime": "按时间排序",
   "sortByName": "按名称排序",
   "noLargeFiles": "没有找到符合条件的大文件",
+  "videoThumbnailError": "视频缩略图不可用",
   "scanFailed": "扫描失败: {error}",
   "deleteThisFile": "删除此文件",
   "deleted": "已删除",
@@ -186,5 +187,10 @@
   "monthly": "每月",
   "periodLabel": "周期: {period} · {time}",
   "nFiles": "{count} 个文件",
-  "executionAction": "执行动作"
+  "executionAction": "执行动作",
+  "deleteRuleTitle": "删除规则",
+  "deleteRuleMessage": "确定要删除规则 \"{name}\" 吗？",
+  "ruleDeleted": "规则已删除",
+  "deletedFilesTitle": "已删除文件 ({count})",
+  "noDeletedFilesDetail": "没有可用的文件详情"
 }

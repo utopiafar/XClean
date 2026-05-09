@@ -103,9 +103,9 @@ class _RuleEditorScreenState extends ConsumerState<RuleEditorScreen> {
       appBar: AppBar(
         title: Text(widget.ruleId == null ? l10n.newRuleTitle : l10n.editRuleTitle),
         actions: [
-          TextButton(
+          FilledButton(
             onPressed: _saveRule,
-            child: Text(l10n.save, style: const TextStyle(color: Colors.white)),
+            child: Text(l10n.save),
           ),
         ],
       ),

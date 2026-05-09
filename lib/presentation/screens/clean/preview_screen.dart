@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:xclean/l10n/app_localizations.dart';
 import '../../../core/utils/size_formatter.dart';
 import '../../../domain/entities/clean_log.dart';
+import '../../../platform/channels.dart';
 import '../../providers/dashboard_provider.dart';
 
 class PreviewScreen extends ConsumerWidget {
@@ -129,10 +130,6 @@ class PreviewScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime dt) {
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-  }
-
   Future<void> _executeClean(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     final notifier = ref.read(scanProvider.notifier);
@@ -160,12 +157,20 @@ class PreviewScreen extends ConsumerWidget {
       final duration = DateTime.now().difference(startTime).inMilliseconds;
       final finalResult = result.copyWith(durationMs: duration);
 
+      // Record deleted file names in log details
+      final currentState = ref.read(scanProvider);
+      final deletedFiles = currentState.files
+          .where((f) => f.selected)
+          .map((f) => f.name)
+          .toList();
+
       await ref.read(logRepositoryProvider).insertLog(CleanLogEntity(
         id: 0,
         executedAt: DateTime.now(),
         taskType: 'manual',
         rulesApplied: [],
         results: finalResult,
+        details: deletedFiles.isEmpty ? null : deletedFiles.join('\n'),
       ));
 
       if (context.mounted) {
@@ -255,8 +260,8 @@ class _FileGridItem extends StatelessWidget {
             ),
           ),
 
-          // File name at bottom (only for non-images or small text)
-          if (!file.isDirectory && !_isImageFile(file.name))
+          // File name at bottom (only for non-images/videos or small text)
+          if (!file.isDirectory && !_isImageFile(file.name) && !_isVideoFile(file.name))
             Positioned(
               bottom: 0,
               left: 0,
@@ -322,6 +327,10 @@ class _FileGridItem extends StatelessWidget {
       );
     }
 
+    if (_isVideoFile(file.name)) {
+      return _VideoThumbnail(path: file.path);
+    }
+
     return _buildFileTypeFallback();
   }
 
@@ -353,10 +362,15 @@ class _FileGridItem extends StatelessWidget {
     return const {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'heif'}.contains(ext);
   }
 
+  bool _isVideoFile(String name) {
+    final ext = name.split('.').last.toLowerCase();
+    return const {'mp4', 'mkv', 'avi', 'mov', 'wmv', 'flv', '3gp', 'm4v', 'ts'}.contains(ext);
+  }
+
   IconData _fileTypeIcon() {
     final ext = file.name.split('.').last.toLowerCase();
     return switch (ext) {
-      'mp4' || 'mkv' || 'avi' || 'mov' || 'wmv' => Icons.video_file_outlined,
+      'mp4' || 'mkv' || 'avi' || 'mov' || 'wmv' || 'flv' || '3gp' || 'm4v' || 'ts' => Icons.video_file_outlined,
       'mp3' || 'aac' || 'flac' || 'wav' || 'ogg' => Icons.audio_file_outlined,
       'pdf' => Icons.picture_as_pdf_outlined,
       'doc' || 'docx' => Icons.description_outlined,
@@ -372,5 +386,88 @@ class _FileGridItem extends StatelessWidget {
   String _fileTypeLabel() {
     final ext = file.name.split('.').last.toUpperCase();
     return ext.isEmpty ? 'FILE' : ext;
+  }
+}
+
+class _VideoThumbnail extends StatefulWidget {
+  final String path;
+
+  const _VideoThumbnail({required this.path});
+
+  @override
+  State<_VideoThumbnail> createState() => _VideoThumbnailState();
+}
+
+class _VideoThumbnailState extends State<_VideoThumbnail> {
+  String? _thumbPath;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThumbnail();
+  }
+
+  Future<void> _loadThumbnail() async {
+    try {
+      final path = await FileChannel.getVideoThumbnail(widget.path);
+      if (mounted) {
+        setState(() {
+          _thumbPath = path;
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return Container(
+        color: Colors.grey.shade200,
+        child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+      );
+    }
+
+    if (_thumbPath != null) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.file(
+            File(_thumbPath!),
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildVideoFallback(),
+          ),
+          const Center(
+            child: Icon(Icons.play_circle_outline, size: 28, color: Colors.white70),
+          ),
+        ],
+      );
+    }
+
+    return _buildVideoFallback();
+  }
+
+  Widget _buildVideoFallback() {
+    return Container(
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.video_file_outlined, size: 32, color: Colors.grey),
+            const SizedBox(height: 4),
+            Text(
+              widget.path.split('.').last.toUpperCase(),
+              style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

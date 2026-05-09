@@ -136,6 +136,7 @@
   "sortByTime": "Sort by time",
   "sortByName": "Sort by name",
   "noLargeFiles": "No large files found matching criteria",
+  "videoThumbnailError": "Video thumbnail unavailable",
   "scanFailed": "Scan failed: {error}",
   "@scanFailed": {
     "placeholders": {
@@ -319,5 +320,20 @@
       "count": {"type": "int"}
     }
   },
-  "executionAction": "Execution Action"
+  "executionAction": "Execution Action",
+  "deleteRuleTitle": "Delete Rule",
+  "deleteRuleMessage": "Are you sure you want to delete the rule \"{name}\"?",
+  "@deleteRuleMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "ruleDeleted": "Rule deleted",
+  "deletedFilesTitle": "Deleted Files ({count})",
+  "@deletedFilesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noDeletedFilesDetail": "No file details available"
 }

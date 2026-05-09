@@ -43,11 +43,11 @@ class RuleListScreen extends ConsumerWidget {
             children: [
               if (presetRules.isNotEmpty) ...[
                 _buildSectionHeader(context, l10n.presetRules),
-                ...presetRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule)),
+                ...presetRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule, canDelete: false)),
               ],
               if (customRules.isNotEmpty) ...[
                 _buildSectionHeader(context, l10n.customRules),
-                ...customRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule)),
+                ...customRules.map((CleanRuleEntity rule) => _RuleCard(rule: rule, canDelete: true)),
               ],
             ],
           );
@@ -74,8 +74,9 @@ class RuleListScreen extends ConsumerWidget {
 
 class _RuleCard extends ConsumerWidget {
   final CleanRuleEntity rule;
+  final bool canDelete;
 
-  const _RuleCard({required this.rule});
+  const _RuleCard({required this.rule, required this.canDelete});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -127,15 +128,56 @@ class _RuleCard extends ConsumerWidget {
           ],
         ),
         isThreeLine: true,
-        trailing: IconButton(
-          icon: const Icon(Icons.edit_outlined),
-          tooltip: l10n.editRule,
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (_) => RuleEditorScreen(ruleId: rule.id),
-            ));
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: l10n.editRule,
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => RuleEditorScreen(ruleId: rule.id),
+                ));
+              },
+            ),
+            if (canDelete)
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                tooltip: l10n.deleteThisFile,
+                onPressed: () => _confirmDelete(context, ref, l10n),
+              ),
+          ],
         ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteRuleTitle),
+        content: Text(l10n.deleteRuleMessage(rule.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(ruleRepositoryProvider).deleteRule(rule.id);
+              ref.invalidate(allRulesProvider);
+              ref.invalidate(enabledRulesProvider);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.ruleDeleted)),
+                );
+              }
+            },
+            child: Text(l10n.confirm, style: const TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

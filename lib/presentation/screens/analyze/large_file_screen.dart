@@ -18,7 +18,7 @@ class LargeFileScreen extends ConsumerStatefulWidget {
 class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
   String _sortBy = 'size';
   bool _ascending = false;
-  int _minSizeMb = 10;
+  int _minSizeMb = 500;
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +54,9 @@ class _LargeFileScreenState extends ConsumerState<LargeFileScreen> {
                 Text(l10n.minFileSize(_minSizeMb), style: Theme.of(context).textTheme.bodyMedium),
                 Slider(
                   value: _minSizeMb.toDouble(),
-                  min: 1,
-                  max: 500,
-                  divisions: 99,
+                  min: 100,
+                  max: 5000,
+                  divisions: 49,
                   label: '$_minSizeMb MB',
                   onChanged: (v) => setState(() => _minSizeMb = v.toInt()),
                 ),

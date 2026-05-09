@@ -100,6 +100,11 @@ class FileChannel {
       'engine': engine,
     }) ?? 0;
   }
+
+  /// Get video thumbnail path (JPEG). Returns null if thumbnail cannot be generated.
+  static Future<String?> getVideoThumbnail(String path) async {
+    return await _channel.invokeMethod<String>('getVideoThumbnail', {'path': path});
+  }
 }
 
 /// Permission channel

@@ -9,6 +9,7 @@ import '../../../domain/entities/clean_rule.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../widgets/permission_banner.dart';
 import '../../widgets/storage_ring.dart';
+import '../logs/log_detail_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -316,13 +317,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       size: 20,
                     ),
                     title: Text(
-                      '${formatBytes(log.results.freedBytes)} · ${log.results.fileCount} ${l10n.nFiles(log.results.fileCount)}',
+                      '${formatBytes(log.results.freedBytes)} · ${l10n.nFiles(log.results.fileCount)}',
                       style: const TextStyle(fontSize: 14),
                     ),
                     subtitle: Text(
                       _formatTime(log.executedAt, l10n),
                       style: const TextStyle(fontSize: 12),
                     ),
+                    trailing: const Icon(Icons.chevron_right, size: 18),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => LogDetailScreen(log: log),
+                    )),
                   );
                 }),
               ],

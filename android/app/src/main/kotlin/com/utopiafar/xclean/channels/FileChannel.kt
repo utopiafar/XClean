@@ -138,6 +138,18 @@ class FileChannel(
                 }
             }
 
+            "getVideoThumbnail" -> {
+                val path = call.argument<String>("path")
+                    ?: return result.error("INVALID_ARG", "path is required", null)
+                scope.launch(Dispatchers.IO) {
+                    try {
+                        val thumbPath = getVideoThumbnailInternal(path)
+                        withContext(Dispatchers.Main) { result.success(thumbPath) }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) { result.success(null) }
+                    }
+                }
+            }
             else -> result.notImplemented()
         }
     }
@@ -354,6 +366,33 @@ class FileChannel(
         }
         sb.append('$')
         return Regex(sb.toString(), RegexOption.IGNORE_CASE)
+    }
+
+    private fun getVideoThumbnailInternal(videoPath: String): String? {
+        val file = File(videoPath)
+        if (!file.exists() || !file.isFile) return null
+
+        return try {
+            val retriever = android.media.MediaMetadataRetriever()
+            retriever.setDataSource(videoPath)
+            val bitmap = retriever.getFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            retriever.release()
+
+            if (bitmap != null) {
+                val cacheDir = android.os.Environment.getExternalStorageDirectory()?.let { File(it, "Android/data/com.utopiafar.xclean/cache/thumbs") }
+                    ?: File(file.parentFile, ".xclean_thumbs")
+                cacheDir.mkdirs()
+                val thumbFile = File(cacheDir, "thumb_${file.name.hashCode()}.jpg")
+                java.io.FileOutputStream(thumbFile).use { out ->
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, out)
+                }
+                thumbFile.absolutePath
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun fileToMap(file: File): Map<String, Any> {

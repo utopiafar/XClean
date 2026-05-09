@@ -452,6 +452,12 @@ abstract class AppLocalizations {
   /// **'No large files found matching criteria'**
   String get noLargeFiles;
 
+  /// No description provided for @videoThumbnailError.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnail unavailable'**
+  String get videoThumbnailError;
+
   /// No description provided for @scanFailed.
   ///
   /// In en, this message translates to:
@@ -1219,6 +1225,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Execution Action'**
   String get executionAction;
+
+  /// No description provided for @deleteRuleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Rule'**
+  String get deleteRuleTitle;
+
+  /// No description provided for @deleteRuleMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the rule \"{name}\"?'**
+  String deleteRuleMessage(String name);
+
+  /// No description provided for @ruleDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule deleted'**
+  String get ruleDeleted;
+
+  /// No description provided for @deletedFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted Files ({count})'**
+  String deletedFilesTitle(int count);
+
+  /// No description provided for @noDeletedFilesDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'No file details available'**
+  String get noDeletedFilesDetail;
 }
 
 class _AppLocalizationsDelegate
