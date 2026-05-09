@@ -11,6 +11,7 @@ String localizePresetName(BuildContext context, String name) {
     'Download Temp Files' => l10n.downloadTempFiles,
     'Log Files' => l10n.logFiles,
     'App Residual' => l10n.appResidual,
+    'APK Installer Files' => l10n.apkInstallerFiles,
     _ => name,
   };
 }
@@ -26,6 +27,7 @@ String localizePresetDesc(BuildContext context, String? desc) {
     'Clean temporary files in download directory' => l10n.downloadTempFilesDesc,
     'Clean application log files' => l10n.logFilesDesc,
     'Clean residual directories of uninstalled apps' => l10n.appResidualDesc,
+    'Clean leftover APK installer packages in download directory' => l10n.apkInstallerFilesDesc,
     _ => desc,
   };
 }

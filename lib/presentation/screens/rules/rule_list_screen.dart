@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xclean/l10n/app_localizations.dart';
 import '../../../core/utils/localization_helper.dart';
+import '../../../data/repositories/rule_repository.dart';
 import '../../../domain/entities/clean_rule.dart';
 import '../../providers/dashboard_provider.dart';
 import 'rule_editor_screen.dart';
@@ -35,8 +36,8 @@ class RuleListScreen extends ConsumerWidget {
             return Center(child: Text(l10n.noRules));
           }
 
-          final presetRules = rules.where((r) => r.id <= 5 && r.id > 0).toList();
-          final customRules = rules.where((r) => r.id > 5).toList();
+          final presetRules = rules.where((r) => kPresetRuleNames.contains(r.name)).toList();
+          final customRules = rules.where((r) => !kPresetRuleNames.contains(r.name)).toList();
 
           return ListView(
             padding: const EdgeInsets.all(16),

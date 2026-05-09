@@ -3,6 +3,15 @@ import 'package:drift/drift.dart';
 import '../../domain/entities/clean_rule.dart';
 import '../local/database.dart';
 
+const Set<String> kPresetRuleNames = {
+  'Thumbnail Cache',
+  'Empty Folders',
+  'Download Temp Files',
+  'Log Files',
+  'App Residual',
+  'APK Installer Files',
+};
+
 class RuleRepository {
   final AppDatabase _db;
 
@@ -32,21 +41,21 @@ class RuleRepository {
     final existing = await _db.getAllRules();
     if (existing.isNotEmpty) return;
 
-    final presets = [
+    const presets = [
       CleanRuleEntity(
         id: 0,
         name: 'Thumbnail Cache',
         description: 'Clean image cache in .thumbnails directory',
         enabled: true,
         priority: 10,
-        scope: const RuleScope(
+        scope: RuleScope(
           paths: ['/storage/emulated/0/DCIM/.thumbnails'],
           recursive: true,
           engine: 'normal',
         ),
-        matchConditions: const [],
-        action: const RuleAction(type: 'delete'),
-        safety: const RuleSafety(requirePreview: true),
+        matchConditions: [],
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
       ),
       CleanRuleEntity(
         id: 0,
@@ -54,16 +63,33 @@ class RuleRepository {
         description: 'Recursively clean empty directories',
         enabled: true,
         priority: 20,
-        scope: const RuleScope(
+        scope: RuleScope(
           paths: ['/storage/emulated/0'],
           recursive: true,
           engine: 'normal',
         ),
-        matchConditions: const [
+        matchConditions: [
           MatchCondition.subfileCount(operator: '==', value: 0),
         ],
-        action: const RuleAction(type: 'delete'),
-        safety: const RuleSafety(requirePreview: true),
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
+      ),
+      CleanRuleEntity(
+        id: 0,
+        name: 'APK Installer Files',
+        description: 'Clean leftover APK installer packages in download directory',
+        enabled: true,
+        priority: 25,
+        scope: RuleScope(
+          paths: ['/storage/emulated/0/Download'],
+          recursive: true,
+          engine: 'normal',
+        ),
+        matchConditions: [
+          MatchCondition.extension(values: ['apk']),
+        ],
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
       ),
       CleanRuleEntity(
         id: 0,
@@ -71,16 +97,16 @@ class RuleRepository {
         description: 'Clean temporary files in download directory',
         enabled: true,
         priority: 30,
-        scope: const RuleScope(
+        scope: RuleScope(
           paths: ['/storage/emulated/0/Download'],
           recursive: true,
           engine: 'normal',
         ),
-        matchConditions: const [
+        matchConditions: [
           MatchCondition.extension(values: ['tmp', 'crdownload', 'part']),
         ],
-        action: const RuleAction(type: 'delete'),
-        safety: const RuleSafety(requirePreview: true),
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
       ),
       CleanRuleEntity(
         id: 0,
@@ -88,16 +114,16 @@ class RuleRepository {
         description: 'Clean application log files',
         enabled: false,
         priority: 40,
-        scope: const RuleScope(
+        scope: RuleScope(
           paths: ['/storage/emulated/0/Android/data'],
           recursive: true,
           engine: 'shizuku',
         ),
-        matchConditions: const [
+        matchConditions: [
           MatchCondition.extension(values: ['log']),
         ],
-        action: const RuleAction(type: 'delete'),
-        safety: const RuleSafety(requirePreview: true),
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
       ),
       CleanRuleEntity(
         id: 0,
@@ -105,36 +131,18 @@ class RuleRepository {
         description: 'Clean residual directories of uninstalled apps',
         enabled: false,
         priority: 50,
-        scope: const RuleScope(
+        scope: RuleScope(
           paths: ['/storage/emulated/0/Android/data'],
           recursive: false,
           engine: 'shizuku',
         ),
-        matchConditions: const [],
-        action: const RuleAction(type: 'delete'),
-        safety: const RuleSafety(requirePreview: true),
+        matchConditions: [],
+        action: RuleAction(type: 'delete'),
+        safety: RuleSafety(requirePreview: true),
       ),
     ];
 
-    final apkRule = CleanRuleEntity(
-      id: 0,
-      name: 'APK Installer Files',
-      description: 'Clean leftover APK installer packages in download directory',
-      enabled: true,
-      priority: 25,
-      scope: const RuleScope(
-        paths: ['/storage/emulated/0/Download'],
-        recursive: true,
-        engine: 'normal',
-      ),
-      matchConditions: const [
-        MatchCondition.extension(values: ['apk']),
-      ],
-      action: const RuleAction(type: 'delete'),
-      safety: const RuleSafety(requirePreview: true),
-    );
-
-    for (final rule in [...presets, apkRule]) {
+    for (final rule in presets) {
       await insertRule(rule);
     }
   }
