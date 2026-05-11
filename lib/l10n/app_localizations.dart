@@ -446,6 +446,66 @@ abstract class AppLocalizations {
   /// **'Large File Analysis'**
   String get largeFileAnalysis;
 
+  /// No description provided for @scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
+  /// No description provided for @rescan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Again'**
+  String get rescan;
+
+  /// No description provided for @sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sort;
+
+  /// No description provided for @largeFileThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Files over {size}'**
+  String largeFileThreshold(String size);
+
+  /// No description provided for @decreaseThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease threshold'**
+  String get decreaseThreshold;
+
+  /// No description provided for @increaseThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase threshold'**
+  String get increaseThreshold;
+
+  /// No description provided for @largeFileNotScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'No scan yet'**
+  String get largeFileNotScanned;
+
+  /// No description provided for @largeFileReadySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold {size}'**
+  String largeFileReadySummary(String size);
+
+  /// No description provided for @largeFileScanningHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning internal storage'**
+  String get largeFileScanningHint;
+
+  /// No description provided for @largeFileScanSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} files · {size}'**
+  String largeFileScanSummary(int count, String size);
+
   /// No description provided for @minFileSize.
   ///
   /// In en, this message translates to:

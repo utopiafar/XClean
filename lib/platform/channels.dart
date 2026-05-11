@@ -50,12 +50,14 @@ class FileChannel {
     String? pattern,
     bool recursive = true,
     String engine = 'auto',
+    int? minSizeBytes,
   }) async {
     final result = await _channel.invokeMethod<List<dynamic>>('scanPath', {
       'path': path,
       'pattern': pattern,
       'recursive': recursive,
       'engine': engine,
+      'minSizeBytes': minSizeBytes,
     });
     return (result ?? [])
         .map((e) => NativeScanResult.fromMap(Map<String, dynamic>.from(e)))
@@ -68,12 +70,14 @@ class FileChannel {
     String? pattern,
     bool recursive = true,
     String engine = 'auto',
+    int? minSizeBytes,
   }) {
     _channel.invokeMethod('startScanStream', {
       'path': path,
       'pattern': pattern,
       'recursive': recursive,
       'engine': engine,
+      'minSizeBytes': minSizeBytes,
     });
     return _eventChannel.receiveBroadcastStream().map((event) {
       return NativeScanResult.fromMap(Map<String, dynamic>.from(event as Map));

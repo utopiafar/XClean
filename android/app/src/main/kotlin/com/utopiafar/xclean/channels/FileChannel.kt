@@ -63,7 +63,8 @@ class FileChannel(
         val path: String,
         val pattern: String?,
         val recursive: Boolean,
-        val engine: String
+        val engine: String,
+        val minSizeBytes: Long?
     )
 
     private data class TargetState(
@@ -101,14 +102,16 @@ class FileChannel(
                 val pattern = call.argument<String>("pattern")
                 val recursive = call.argument<Boolean>("recursive") ?: true
                 val engine = call.argument<String>("engine") ?: "auto"
+                val minSizeBytes = numberArgument(call, "minSizeBytes")
 
                 scope.launch(Dispatchers.IO) {
                     try {
                         DiagnosticLog.write(
                             "scan.request",
-                            "path=$path recursive=$recursive engine=$engine pattern=${pattern ?: ""}"
+                            "path=$path recursive=$recursive engine=$engine " +
+                                    "minSizeBytes=${minSizeBytes ?: ""} pattern=${pattern ?: ""}"
                         )
-                        val files = scanPathInternal(path, pattern, recursive, engine)
+                        val files = scanPathInternal(path, pattern, recursive, engine, minSizeBytes)
                         withContext(Dispatchers.Main) { result.success(files) }
                     } catch (e: Exception) {
                         DiagnosticLog.write("scan.error", "path=$path engine=$engine", e)
@@ -125,8 +128,9 @@ class FileChannel(
                 val pattern = call.argument<String>("pattern")
                 val recursive = call.argument<Boolean>("recursive") ?: true
                 val engine = call.argument<String>("engine") ?: "auto"
+                val minSizeBytes = numberArgument(call, "minSizeBytes")
 
-                pendingStreamArgs = ScanArgs(path, pattern, recursive, engine)
+                pendingStreamArgs = ScanArgs(path, pattern, recursive, engine, minSizeBytes)
                 result.success(true)
             }
 
@@ -226,7 +230,14 @@ class FileChannel(
 
         streamJob = scope.launch(Dispatchers.IO) {
             try {
-                scanPathStreamInternal(args.path, args.pattern, args.recursive, args.engine, events)
+                scanPathStreamInternal(
+                    args.path,
+                    args.pattern,
+                    args.recursive,
+                    args.engine,
+                    args.minSizeBytes,
+                    events
+                )
                 if (!isStreamCancelled.get()) {
                     withContext(Dispatchers.Main) { events.endOfStream() }
                 }
@@ -254,12 +265,15 @@ class FileChannel(
         path: String,
         pattern: String?,
         recursive: Boolean,
-        engine: String
+        engine: String,
+        minSizeBytes: Long?
     ): List<Map<String, Any>> {
         val resolvedEngine = resolveEngine(engine)
         val results = when (resolvedEngine) {
             ENGINE_ROOT -> RootFileEngine.listFiles(path, recursive, pattern)
+                .filterByMinSize(minSizeBytes)
             ENGINE_SHIZUKU -> ShizukuFileEngine.listFiles(path, recursive, pattern)
+                .filterByMinSize(minSizeBytes)
             else -> {
                 val results = mutableListOf<Map<String, Any>>()
                 val root = File(path)
@@ -282,6 +296,7 @@ class FileChannel(
 
                 files.forEach { file ->
                     if (matcher != null && !matcher(file.name)) return@forEach
+                    if (!matchesMinSize(file, minSizeBytes)) return@forEach
                     results.add(fileToMap(file))
                 }
                 results
@@ -289,7 +304,8 @@ class FileChannel(
         }
         DiagnosticLog.write(
             "scan.result",
-            "path=$path requestedEngine=$engine resolvedEngine=$resolvedEngine count=${results.size}"
+            "path=$path requestedEngine=$engine resolvedEngine=$resolvedEngine " +
+                    "minSizeBytes=${minSizeBytes ?: ""} count=${results.size}"
         )
         return results
     }
@@ -299,6 +315,7 @@ class FileChannel(
         pattern: String?,
         recursive: Boolean,
         engine: String,
+        minSizeBytes: Long?,
         events: EventChannel.EventSink
     ) {
         val root = File(path)
@@ -314,6 +331,7 @@ class FileChannel(
         files.forEach { file ->
             if (isStreamCancelled.get()) return
             if (matcher != null && !matcher(file.name)) return@forEach
+            if (!matchesMinSize(file, minSizeBytes)) return@forEach
 
             withContext(Dispatchers.Main) {
                 events.success(fileToMap(file))
@@ -559,6 +577,27 @@ class FileChannel(
     private fun createPatternMatcher(pattern: String): (String) -> Boolean {
         val regex = globToRegex(pattern)
         return { name -> regex.matches(name) }
+    }
+
+    private fun numberArgument(call: MethodCall, name: String): Long? {
+        return when (val raw = call.argument<Any>(name)) {
+            is Number -> raw.toLong()
+            else -> null
+        }
+    }
+
+    private fun matchesMinSize(file: File, minSizeBytes: Long?): Boolean {
+        if (minSizeBytes == null || file.isDirectory) return true
+        return file.length() >= minSizeBytes
+    }
+
+    private fun List<Map<String, Any>>.filterByMinSize(minSizeBytes: Long?): List<Map<String, Any>> {
+        if (minSizeBytes == null) return this
+        return filter { item ->
+            val isDirectory = item["isDirectory"] as? Boolean ?: false
+            val size = item["size"] as? Number ?: return@filter false
+            isDirectory || size.toLong() >= minSizeBytes
+        }
     }
 
     /**

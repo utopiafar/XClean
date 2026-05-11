@@ -58,6 +58,32 @@
   "cleanFailed": "清理失败: {error}",
   "confirm": "确定",
   "largeFileAnalysis": "大文件分析",
+  "scan": "扫描",
+  "rescan": "重新扫描",
+  "sort": "排序",
+  "largeFileThreshold": "超过 {size} 的文件",
+  "@largeFileThreshold": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "decreaseThreshold": "降低阈值",
+  "increaseThreshold": "提高阈值",
+  "largeFileNotScanned": "尚未扫描",
+  "largeFileReadySummary": "阈值 {size}",
+  "@largeFileReadySummary": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "largeFileScanningHint": "正在扫描内部存储",
+  "largeFileScanSummary": "{count} 个文件 · {size}",
+  "@largeFileScanSummary": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "size": {"type": "String"}
+    }
+  },
   "minFileSize": "最小文件大小: {size} MB",
   "sortBySize": "按大小排序",
   "sortByTime": "按时间排序",

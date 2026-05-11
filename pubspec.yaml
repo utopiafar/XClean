@@ -1,7 +1,7 @@
 name: xclean
 description: "A lightweight and powerful file cleaner for Android."
 publish_to: 'none'
-version: 0.2.5+7
+version: 0.2.6+8
 
 environment:
   sdk: ^3.11.4

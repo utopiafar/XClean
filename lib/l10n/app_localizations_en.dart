@@ -215,6 +215,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get largeFileAnalysis => 'Large File Analysis';
 
   @override
+  String get scan => 'Scan';
+
+  @override
+  String get rescan => 'Scan Again';
+
+  @override
+  String get sort => 'Sort';
+
+  @override
+  String largeFileThreshold(String size) {
+    return 'Files over $size';
+  }
+
+  @override
+  String get decreaseThreshold => 'Decrease threshold';
+
+  @override
+  String get increaseThreshold => 'Increase threshold';
+
+  @override
+  String get largeFileNotScanned => 'No scan yet';
+
+  @override
+  String largeFileReadySummary(String size) {
+    return 'Threshold $size';
+  }
+
+  @override
+  String get largeFileScanningHint => 'Scanning internal storage';
+
+  @override
+  String largeFileScanSummary(int count, String size) {
+    return '$count files · $size';
+  }
+
+  @override
   String minFileSize(int size) {
     return 'Min file size: $size MB';
   }

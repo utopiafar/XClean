@@ -80,7 +80,7 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.version),
-            subtitle: const Text('0.2.5'),
+            subtitle: const Text('0.2.6'),
           ),
           _buildSectionHeader(context, l10n.dataSection),
           ListTile(

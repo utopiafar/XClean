@@ -130,6 +130,32 @@
   },
   "confirm": "OK",
   "largeFileAnalysis": "Large File Analysis",
+  "scan": "Scan",
+  "rescan": "Scan Again",
+  "sort": "Sort",
+  "largeFileThreshold": "Files over {size}",
+  "@largeFileThreshold": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "decreaseThreshold": "Decrease threshold",
+  "increaseThreshold": "Increase threshold",
+  "largeFileNotScanned": "No scan yet",
+  "largeFileReadySummary": "Threshold {size}",
+  "@largeFileReadySummary": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "largeFileScanningHint": "Scanning internal storage",
+  "largeFileScanSummary": "{count} files · {size}",
+  "@largeFileScanSummary": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "size": {"type": "String"}
+    }
+  },
   "minFileSize": "Min file size: {size} MB",
   "@minFileSize": {
     "placeholders": {

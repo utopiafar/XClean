@@ -211,6 +211,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get largeFileAnalysis => '大文件分析';
 
   @override
+  String get scan => '扫描';
+
+  @override
+  String get rescan => '重新扫描';
+
+  @override
+  String get sort => '排序';
+
+  @override
+  String largeFileThreshold(String size) {
+    return '超过 $size 的文件';
+  }
+
+  @override
+  String get decreaseThreshold => '降低阈值';
+
+  @override
+  String get increaseThreshold => '提高阈值';
+
+  @override
+  String get largeFileNotScanned => '尚未扫描';
+
+  @override
+  String largeFileReadySummary(String size) {
+    return '阈值 $size';
+  }
+
+  @override
+  String get largeFileScanningHint => '正在扫描内部存储';
+
+  @override
+  String largeFileScanSummary(int count, String size) {
+    return '$count 个文件 · $size';
+  }
+
+  @override
   String minFileSize(int size) {
     return '最小文件大小: $size MB';
   }
