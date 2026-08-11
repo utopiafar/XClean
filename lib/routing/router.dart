@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import '../presentation/screens/dashboard/dashboard_screen.dart';
 import '../presentation/screens/clean/preview_screen.dart';
+import '../presentation/screens/clean/scan_screen.dart';
 import '../presentation/screens/rules/rule_editor_screen.dart';
 import '../presentation/screens/rules/rule_list_screen.dart';
 import '../presentation/screens/analyze/large_file_screen.dart';
@@ -9,13 +10,17 @@ import '../presentation/screens/logs/log_list_screen.dart';
 import '../presentation/screens/settings/settings_screen.dart';
 import '../presentation/screens/tasks/auto_task_screen.dart';
 
-final router = GoRouter(
+GoRouter createRouter() => GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const DashboardScreen()),
     GoRoute(
       path: '/preview',
       builder: (context, state) => const PreviewScreen(),
+    ),
+    GoRoute(
+      path: '/scan',
+      builder: (context, state) => const ScanScreen(),
     ),
     GoRoute(
       path: '/rules',
@@ -47,3 +52,5 @@ final router = GoRouter(
     ),
   ],
 );
+
+final router = createRouter();

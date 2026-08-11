@@ -26,10 +26,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _initData() async {
-    final rules = await ref.read(ruleRepositoryProvider).getAllRules();
-    if (rules.isEmpty) {
-      await ref.read(ruleRepositoryProvider).initPresetRules();
-    }
+    await ref.read(ruleRepositoryProvider).initPresetRules();
     ref.invalidate(enabledRulesProvider);
     ref.invalidate(recentLogsProvider);
     ref.invalidate(storageInfoProvider);
@@ -69,7 +66,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const SizedBox(height: 16),
             _buildStorageCard(storageAsync, l10n),
             const SizedBox(height: 16),
-            _buildQuickActions(enabledRulesAsync, scanState, l10n),
+            _buildQuickActions(scanState, l10n),
             const SizedBox(height: 16),
             _buildEnabledRulesCard(enabledRulesAsync, l10n),
             const SizedBox(height: 16),
@@ -153,11 +150,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildQuickActions(
-    AsyncValue<List<CleanRuleEntity>> rulesAsync,
-    ScanState scanState,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildQuickActions(ScanState scanState, AppLocalizations l10n) {
     final isScanning = scanState.isScanning;
 
     return Card(
@@ -172,37 +165,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: isScanning
-                        ? null
-                        : () async {
-                            final rules = await ref.read(enabledRulesProvider.future);
-                            if (rules.isEmpty) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.noEnabledRules)),
-                                );
-                              }
-                              return;
-                            }
-                            await ref.read(scanProvider.notifier).scanWithRules(rules);
-                            final files = ref.read(scanProvider).files;
-                            if (mounted) {
-                              if (files.isNotEmpty) {
-                                context.push('/preview');
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.noMatchedFiles)),
-                                );
-                              }
-                            }
-                          },
+                    onPressed: isScanning ? null : () => context.push('/scan'),
                     icon: isScanning
                         ? const SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Icon(Icons.cleaning_services),
+                        : const Icon(Icons.radar_rounded),
                     label: Text(isScanning ? l10n.scanning : l10n.oneKeyScan),
                   ),
                 ),

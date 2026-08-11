@@ -14,6 +14,7 @@ const Set<String> kPresetRuleNames = {
 
 class RuleRepository {
   final AppDatabase _db;
+  Future<void>? _presetRulesInitialization;
 
   RuleRepository(this._db);
 
@@ -37,7 +38,20 @@ class RuleRepository {
 
   Future<int> deleteRule(int id) => _db.deleteRule(id);
 
-  Future<void> initPresetRules() async {
+  Future<void> initPresetRules() {
+    final inProgress = _presetRulesInitialization;
+    if (inProgress != null) return inProgress;
+
+    final initialization = _initializePresetRules();
+    _presetRulesInitialization = initialization;
+    return initialization.whenComplete(() {
+      if (identical(_presetRulesInitialization, initialization)) {
+        _presetRulesInitialization = null;
+      }
+    });
+  }
+
+  Future<void> _initializePresetRules() async {
     final existing = await _db.getAllRules();
     if (existing.isNotEmpty) return;
 

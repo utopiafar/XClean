@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_one_key_scan">一键扫描</string>
+    <string name="shortcut_one_key_scan_long">立即开始一键扫描</string>
+</resources>

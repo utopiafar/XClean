@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Legacy fallback for launchers that do not render adaptive icons. -->
+    <path
+        android:fillColor="#FF1677E8"
+        android:pathData="M24,2A22,22 0,1 0,24,46A22,22 0,0 0,24,2" />
+    <path
+        android:fillColor="#331D9BF0"
+        android:pathData="M24,8A16,16 0,1 0,24,40A16,16 0,0 0,24,8" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M17,11L14.5,11C12.57,11 11,12.57 11,14.5L11,17L14,17L14,14.5C14,14.22 14.22,14 14.5,14L17,14Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M31,11L33.5,11C35.43,11 37,12.57 37,14.5L37,17L34,17L34,14.5C34,14.22 33.78,14 33.5,14L31,14Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,31L11,33.5C11,35.43 12.57,37 14.5,37L17,37L17,34L14.5,34C14.22,34 14,33.78 14,33.5L14,31Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M37,31L37,33.5C37,35.43 35.43,37 33.5,37L31,37L31,34L33.5,34C33.78,34 34,33.78 34,33.5L34,31Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,17L26.1,21.9L31,24L26.1,26.1L24,31L21.9,26.1L17,24L21.9,21.9Z" />
+</vector>
