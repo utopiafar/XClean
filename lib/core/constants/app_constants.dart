@@ -1,6 +1,6 @@
 class AppConstants {
   static const String appName = 'XClean';
-  static const String appVersion = '0.2.6';
+  static const String appVersion = '0.2.7';
 
   // Storage keys
   static const String keyFirstLaunch = 'first_launch';
