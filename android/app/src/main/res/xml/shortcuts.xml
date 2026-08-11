@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="one_key_scan"
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_one_key_scan"
+        android:shortcutShortLabel="@string/shortcut_one_key_scan"
+        android:shortcutLongLabel="@string/shortcut_one_key_scan_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="xclean://shortcut/scan"
+            android:targetPackage="com.utopiafar.xclean"
+            android:targetClass="com.utopiafar.xclean.MainActivity" />
+    </shortcut>
+</shortcuts>

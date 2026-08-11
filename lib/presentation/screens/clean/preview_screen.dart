@@ -51,7 +51,11 @@ class PreviewScreen extends ConsumerWidget {
                     child: OutlinedButton(
                       onPressed: () {
                         ref.read(scanProvider.notifier).clear();
-                        context.pop();
+                        if (Navigator.of(context).canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/');
+                        }
                       },
                       child: Text(l10n.cancel),
                     ),

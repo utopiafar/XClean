@@ -103,7 +103,35 @@ class ScannedFile {
 class ScanNotifier extends StateNotifier<ScanState> {
   ScanNotifier() : super(const ScanState());
 
+  Future<void>? _activeScan;
+
+  /// The in-flight scan, if one is already using the shared scan state.
+  Future<void>? get activeScan => _activeScan;
+
+  /// Starts a scan or joins the one already in progress.
+  ///
+  /// Scan results live in a single provider, so concurrent scans would race to
+  /// overwrite those results. Returning the active future keeps all entry
+  /// points (including launcher shortcuts) single-flight.
   Future<void> scanWithRules(List<CleanRuleEntity> rules) async {
+    final activeScan = _activeScan;
+    if (activeScan != null) {
+      await activeScan;
+      return;
+    }
+
+    final scan = _scanWithRules(rules);
+    _activeScan = scan;
+    try {
+      await scan;
+    } finally {
+      if (identical(_activeScan, scan)) {
+        _activeScan = null;
+      }
+    }
+  }
+
+  Future<void> _scanWithRules(List<CleanRuleEntity> rules) async {
     state = const ScanState(isScanning: true, progress: 0, files: []);
     final allFiles = <ScannedFile>[];
 

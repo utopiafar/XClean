@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xclean/l10n/app_localizations.dart';
 import 'package:xclean/presentation/providers/dashboard_provider.dart';
 import 'package:xclean/presentation/screens/clean/preview_screen.dart';
@@ -38,7 +39,9 @@ void main() {
     ProviderScope buildApp(Widget child) {
       return ProviderScope(
         overrides: [
-          scanProvider.overrideWith((ref) => ScanNotifier()..state = ScanState(files: files)),
+          scanProvider.overrideWith(
+            (ref) => ScanNotifier()..state = ScanState(files: files),
+          ),
         ],
         child: MaterialApp(
           localizationsDelegates: const [
@@ -81,7 +84,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            scanProvider.overrideWith((ref) => ScanNotifier()..state = const ScanState(files: [])),
+            scanProvider.overrideWith(
+              (ref) => ScanNotifier()..state = const ScanState(files: []),
+            ),
           ],
           child: const MaterialApp(
             localizationsDelegates: [
@@ -106,6 +111,56 @@ void main() {
 
       expect(find.byType(OutlinedButton), findsOneWidget);
       expect(find.byType(FilledButton), findsOneWidget);
+    });
+
+    testWidgets('cancel returns to root when preview has no back stack', (
+      tester,
+    ) async {
+      final testRouter = GoRouter(
+        initialLocation: '/preview',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Dashboard root'))),
+          ),
+          GoRoute(
+            path: '/preview',
+            builder: (context, state) => const PreviewScreen(),
+          ),
+        ],
+      );
+      addTearDown(testRouter.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            scanProvider.overrideWith(
+              (ref) => ScanNotifier()..state = ScanState(files: files),
+            ),
+          ],
+          child: MaterialApp.router(
+            routerConfig: testRouter,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              AppLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(testRouter.routeInformationProvider.value.uri.path, '/preview');
+
+      await tester.tap(find.byType(OutlinedButton));
+      await tester.pump();
+      await tester.pump();
+
+      expect(testRouter.routeInformationProvider.value.uri.path, '/');
+      expect(find.text('Dashboard root'), findsOneWidget);
     });
   });
 }
